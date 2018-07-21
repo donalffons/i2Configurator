@@ -2,3 +2,6 @@
 	path = three.js
 	url = https://github.com/mrdoob/three.js.git
 	branch = master
+[submodule "crunchdb"]
+	path = crunchdb
+	url = https://github.com/cybrox/crunchdb.git
