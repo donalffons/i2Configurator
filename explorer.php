@@ -65,9 +65,9 @@ $GLOBALS['exclude_folders'] = array(
 );
 
 // CurnchDB
-require __DIR__.'/crunchDB/src/crunchDB.php';
-require __DIR__.'/crunchDB/src/crunchTable.php';
-require __DIR__.'/crunchDB/src/crunchResource.php';
+require __DIR__.'/crunchdb/src/crunchDB.php';
+require __DIR__.'/crunchdb/src/crunchTable.php';
+require __DIR__.'/crunchdb/src/crunchResource.php';
 use cybrox\crunchdb\CrunchDB as CrunchDB;
 
 // include user config php file
