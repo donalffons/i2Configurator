@@ -1227,9 +1227,14 @@ folders: <?php echo $num_folders ?>
 </table>
 <?php
 $dbdir = 'WebGL Models/' . urldecode(FM_PATH) . '/db/';
-if (file_exists($dbdir)) {
-    $cdb = new CrunchDB($dbdir);
-    if($cdb->table('variants')->exists()) {?>
+if (!file_exists($dbdir)) {
+    mkdir($dbdir, 0777, true);
+}
+$cdb = new CrunchDB($dbdir);
+if(!$cdb->table('variants')->exists()) {
+    $cdb->table('variants')->create();
+    $cdb->table('variants')->insert(array("name" => "name", "filenames" => "[\"filename\"]", "propertyChange" => "propertyChange"));
+}?>
 <table class="table" id="main-table">
     <thead>
         <tr>
@@ -1286,8 +1291,6 @@ if (file_exists($dbdir)) {
         </td>
     </tr>
 <?php
-        }
-    }
 }
 ?>
     <tr>
