@@ -1226,15 +1226,16 @@ folders: <?php echo $num_folders ?>
 ?>
 </table>
 <?php
-$dbdir = 'WebGL Models/' . urldecode(FM_PATH) . '/db/';
-if (!file_exists($dbdir)) {
-    mkdir($dbdir, 0777, true);
-}
-$cdb = new CrunchDB($dbdir);
-if(!$cdb->table('variants')->exists()) {
-    $cdb->table('variants')->create();
-    $cdb->table('variants')->insert(array("name" => "name", "filenames" => "[\"filename\"]", "propertyChange" => "propertyChange"));
-}?>
+if(FM_PATH != "") {
+    $dbdir = 'WebGL Models/' . urldecode(FM_PATH) . '/db/';
+    if (!file_exists($dbdir)) {
+        mkdir($dbdir, 0777, true);
+    }
+    $cdb = new CrunchDB($dbdir);
+    if(!$cdb->table('variants')->exists()) {
+        $cdb->table('variants')->create();
+        $cdb->table('variants')->insert(array("name" => "name", "filenames" => "[\"filename\"]", "propertyChange" => "propertyChange"));
+    }?>
 <table class="table" id="main-table">
     <thead>
         <tr>
@@ -1290,9 +1291,9 @@ if(!$cdb->table('variants')->exists()) {
             ?>
         </td>
     </tr>
-<?php
-}
-?>
+    <?php
+    }
+    ?>
     <tr>
         <td colspan=5>
             <a id="add" href="#">Add new</a>
@@ -1326,7 +1327,9 @@ if(!$cdb->table('variants')->exists()) {
         </td>
     </tr>
 </table>
-<?php if (!FM_READONLY): ?>
+<?php
+}
+if (!FM_READONLY): ?>
 <p class="path footer-links"><a href="#/select-all" class="group-btn" onclick="select_all();return false;"><i class="fa fa-check-square"></i> Select all</a> &nbsp;
 <a href="#/unselect-all" class="group-btn" onclick="unselect_all();return false;"><i class="fa fa-window-close"></i> Unselect all</a> &nbsp;
 <a href="#/invert-all" class="group-btn" onclick="invert_all();return false;"><i class="fa fa-th-list"></i> Invert selection</a> &nbsp;
