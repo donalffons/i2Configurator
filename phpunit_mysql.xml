@@ -15,10 +15,7 @@
 
     <filter>
         <whitelist>
-            <directory>./</directory>
-            <exclude>
-                <directory>./Tests</directory>
-            </exclude>
+            <directory>./Tests</directory>
         </whitelist>
     </filter>
 </phpunit>
