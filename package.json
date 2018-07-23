@@ -4,11 +4,16 @@
     "description": "A 3D uploader / configurator for the web",
     "main": "tests/webserver.js",
     "scripts": {
-        "test": "curl localhost:3000/test.php"
+        "test": "grunt test"
     },
     "keywords": [
         "3D"
     ],
     "author": "Sebastian Alff",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-jshint": "~0.6.0",
+        "grunt-contrib-nodeunit": "~0.2.0"
+      }
 }
