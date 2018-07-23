@@ -3,9 +3,9 @@
 var childProcess = require("child_process");
 var path = require("path");
 var request = require('request');
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer');
 
-exports.testAdding = function(test){  
+exports.testAdding = async function(test){  
     var x = 3,
         y = 2;
     test.equals(x+y, 5, "Test add function");
