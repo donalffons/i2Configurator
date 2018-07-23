@@ -26,7 +26,6 @@ before_install:
  - npm i -g npm@v6.2
 
 before_script:
- - npm install git+https://github.com/gruntjs/grunt-contrib-jshint.git
  - npm install grunt-cli -g
  - npm install express --save
 
