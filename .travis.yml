@@ -4,15 +4,23 @@ os:
 language: node_js
 
 node_js:
- - '8'
- - '9'
  - '10'
  - 'node'
+
+matrix:
+ include:
+  - name: "PHP 5.6"
+    php: "5.6"
+  - name: "php 7"
+    php: "7"
+
+before_install:
+ - sudo apt-get update
 
 before_script:
  - npm install grunt-cli -g
  - npm install express --save
 
-#script:
-# - node tests/webserver.js &
-# - curl localhost:3000/test.php
+script:
+ - php --version
+ - grunt test
