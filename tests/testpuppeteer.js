@@ -32,6 +32,7 @@ exports.testAdding = async function(test){
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
             await page.$eval('form', form => form.submit());
+            await page.waitForNavigation({ waitUntil: 'networkidle0' });
             bodyHTML = await page.evaluate(() => document.body.innerHTML);
             console.log(bodyHTML);
             await console.log("-----Click on Dancing Robot Test-----\n");
