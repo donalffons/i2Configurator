@@ -3,7 +3,7 @@
 class ExecPHP {
     constructor() {
             this.phpPath = 'php';
-            this.phpFolder = 'phpfiles/';
+            this.phpFolder = 'tests/';
     }
     
     parseFile(fileName,callback) {
