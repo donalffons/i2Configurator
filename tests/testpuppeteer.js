@@ -31,13 +31,10 @@ exports.testAdding = async function(test){
             // Login
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
-            await Promise.all([
-                page.evaluate(() => {
-                    const element = document.querySelector("form")
-                    element.submit()
-                }),
-                page.waitForNavigation({ waitUntil: 'networkidle0' }),
-            ]);
+            await page.evaluate(() => {
+                const element = document.querySelector("form");
+                element.submit();
+            });
             bodyHTML = await page.evaluate(() => document.body.innerHTML);
             console.log(bodyHTML);
             await console.log("-----Click on Dancing Robot Test-----\n");
