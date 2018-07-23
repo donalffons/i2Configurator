@@ -17,7 +17,7 @@ exports.testAdding = function(test){
     setTimeout(function() {
         console.log('waited 3 seconds');
         var options = {
-            host: 'localhost:3000',
+            host: 'localhost',
             path: '/test.php'
         };
         http.request(options, function(){
