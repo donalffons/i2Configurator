@@ -13,10 +13,10 @@ exports.testAdding = function(test){
     });
     cp.on("error", console.error.bind(console));
 
-    console.log("starting timeout");
+    console.log("starting timeout\n");
     setTimeout(function() {
-        console.log('waited 3 seconds');
-        request('http://127.0.0.1:3000/test.php', function (err, res) {
+        console.log('waited 3 seconds\n');
+        request('http://127.0.0.1:3000/tests/test.php', function (err, res) {
             if (err) return console.error(err.message);
 
             console.log(res.body);
