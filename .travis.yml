@@ -10,19 +10,24 @@ matrix:
  include:
   - name: 'NodeJS latest / PHP 5.6'
     env: PACKAGENAME=php5.6
+    php: '5.6'
   - name: 'NodeJS latest / PHP 7'
     env: PACKAGENAME=php7.0
+    php: '7.0'
+  - name: 'NodeJS latest / PHP 7.1'
+    env: PACKAGENAME=php7.1
+    php: '7.1'
 
 before_install:
- # https://askubuntu.com/questions/756181/installing-php-5-6-on-xenial-16-04
- # Remove all the stock php packages
- - sudo apt-get purge `dpkg -l | grep php| awk '{print $2}' |tr "\n" " "`
- # Add the PPA
- - sudo apt-get install software-properties-common
- - sudo add-apt-repository -y ppa:ondrej/php
- # Install your PHP Version
- - sudo apt-get update
- - sudo apt-get install $PACKAGENAME
+#  # https://askubuntu.com/questions/756181/installing-php-5-6-on-xenial-16-04
+#  # Remove all the stock php packages
+#  - sudo apt-get purge `dpkg -l | grep php| awk '{print $2}' |tr "\n" " "`
+#  # Add the PPA
+#  - sudo apt-get install software-properties-common
+#  - sudo add-apt-repository -y ppa:ondrej/php
+#  # Install your PHP Version
+#  - sudo apt-get update
+#  - sudo apt-get install $PACKAGENAME
  
 
 before_script:
