@@ -10,7 +10,9 @@ class ExecPHP {
             console.log('parsing file: ' + realFileName + '\n');
 
             var exec = require('child_process').exec;
-            var cmd = 'php ' + realFileName;
+            var cmd =   'SERVER_NAME=localhost \
+                         HTTP_HOST=localhost \
+                         php ' + realFileName;
 
             exec(cmd, function(error, stdout, stderr) {
                 console.log('done parsing: ' + realFileName + '\n');
