@@ -28,6 +28,10 @@ exports.testAdding = async function(test){
             await console.log("Page content: \n"+bodyHTML+"\n");
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
+            await Promise.all([
+                page.click("button[type=submit]"),
+                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            ]);
             await page.click(':nth-child(2) > :nth-child(2) > .filename > a');
             await page.goto('http://localhost/I2Configurator/explorer.php?p=Dancing+Robot+Test');
             await page.click(':nth-child(2) > :nth-child(3) > a');
