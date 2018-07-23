@@ -1,17 +1,15 @@
 /*jshint esversion: 6 */
 
-var express = require('express');
-var app = express();
-
-var execPHP = require('./execphp.js')();
-
-app.use('*.php',function(request,response,next) {
-        execPHP.parseFile(request.originalUrl.substr(1),function(phpResult) {
-                response.write(phpResult);
-                response.end();
-        });
+grunt.initConfig({
+    php: {
+        test: {
+            options: {
+                port: 3000,
+                keepalive: true
+            }
+        }
+    }
 });
 
-app.listen(3000, function () {
-        console.log('Node server listening on port 3000!\n');
-});
+grunt.registerTask('server', ['php']);
+console.log("Started PHP webserver on port 3000.\n")
