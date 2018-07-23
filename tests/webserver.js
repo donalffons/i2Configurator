@@ -3,8 +3,6 @@ var app = express();
 
 var execPHP = require('./execphp.js')();
 
-execPHP.phpFolder = 'phpfiles';
-
 app.use('*.php',function(request,response,next) {
         execPHP.parseFile(request.originalUrl,function(phpResult) {
                 response.write(phpResult);
