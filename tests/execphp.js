@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 class ExecPHP {
     constructor() {
             this.phpPath = 'php';
