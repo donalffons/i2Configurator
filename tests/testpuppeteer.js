@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 var childProcess = require("child_process");
 var path = require("path");
 var request = require('request');
