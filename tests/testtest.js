@@ -20,9 +20,6 @@ exports.testAdding = function(test){
             if (err) return console.error(err.message);
 
             console.log(res.body);
-            // Hello world
-
-            server.close();
-            });
+        });
     }, 3000);
 };
