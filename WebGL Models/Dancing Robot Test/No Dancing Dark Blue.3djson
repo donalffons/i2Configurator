@@ -1,0 +1,23 @@
+{
+    "variant": "No Dancing Dark Blue - Title",
+    "filename": "Samba Dancing.fbx",
+    "description": "This a test with no animation",
+    "category": "This a free text field",
+    "visible": true,
+    "property-changes": [
+        {
+            "comment": "change color to dark blue",
+            "type": "THREE.Vector3",
+            "property-selectors": [
+                {
+                    "path": ".children[\"child1\"].children[\"child1-1].position\""
+                }
+            ],
+            "value": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+            }
+        }
+    ]
+}

@@ -21,24 +21,45 @@ exports.testAdding = async function(test){
         console.log('waited 3 seconds\n');
 
         await (async () => {
+            var bodyHTML;
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.goto('http://127.0.0.1:3000/explorer.php', {waitUntil: 'networkidle0'});
-            let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            await console.log("Page content: \n"+bodyHTML+"\n");
+            bodyHTML = await page.evaluate(() => document.body.innerHTML);
+            await console.log("Login\n");
+            // Login
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
             await Promise.all([
                 page.click("input[type=submit]"),
                 page.waitForNavigation({ waitUntil: 'networkidle0' }),
             ]);
-            await page.click(':nth-child(2) > :nth-child(2) > .filename > a');
-            await page.goto('http://localhost/I2Configurator/explorer.php?p=Dancing+Robot+Test');
-            await page.click(':nth-child(2) > :nth-child(3) > a');
-            await page.goto('http://localhost/I2Configurator/editor.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title');
-            await page.click(':nth-child(2) > :nth-child(2) > a');
-            await page.goto('http://localhost/I2Configurator/viewer.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title');
-            await browser.close()
+            await console.log("Click on Dancing Robot Test\n");
+            // Click on Dancing Robot Test
+            await Promise.all([
+                page.click('a[href="?p=Dancing+Robot+Test"]'),
+                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            ]);
+            await console.log("Click on Edit link\n");
+            // Click on Edit link
+            await Promise.all([
+                page.click('a[href="http://localhost/I2Configurator/editor.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title"]'),
+                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            ]);
+            await console.log("Hover on File\n");
+            // Hover on File
+            await Promise.all([
+                page.hover('div[innerHTML="File"]'),
+                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            ]);
+            await console.log("Click on Close\n");
+            // Click on Close
+            await Promise.all([
+                page.click('div[innerHTML="Close"]'),
+                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            ]);
+            await console.log("browser.close()\n");
+            await browser.close();
         })();
 
         console.log('waited 3 seconds\n');

@@ -1,0 +1,65 @@
+{
+    "variant": "Salsa Dancing Bright Red - Title",
+    "filename": "Samba Dancing.fbx",
+    "description": "This a test with animation",
+    "category": "This a free text field",
+    "visible": true,
+    "property-changes": [
+        {
+            "comment": "change color to red",
+            "property-selectors": [
+                {
+                    "comment": "select all relevant materials",
+                    "type": "material",
+                    "select-by": "object-hierarchy",
+                    "object-hierarchy": [
+                        "parent",
+                        "child1",
+                        "child1-1"
+                        ],
+                    "material-slots": [
+                        0
+                        ]
+                }
+            ],
+            "changes": [
+                {
+                    "type": "change-map",
+                    "map-type": "color",
+                    "map-filename": "brighttexture.png"
+                }, {
+                    "type": "change-map",
+                    "map-type": "roughness",
+                    "map-filename": "roughness.png"
+                }, {
+                    "type": "change-color",
+                    "color-r": 1,
+                    "color-g": 0,
+                    "color-b": 0
+                }
+            ]
+        },
+        {
+            "comment": "play animation",
+            "property-selectors": [
+                {
+                    "comment": "select action",
+                    "type": "action",
+                    "select-by": "object-hierarchy",
+                    "object-hierarchy": [
+                        "parent"
+                        ],
+                    "animation-index": [
+                        0
+                        ]
+                }
+            ],
+            "changes": [
+                {
+                    "type": "change-animation-state",
+                    "animation-state": "play"
+                }
+            ]
+        }
+    ]
+}
