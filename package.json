@@ -1,0 +1,14 @@
+{
+    "name": "I2Configurator",
+    "version": "0.0.1",
+    "description": "A 3D uploader / configurator for the web",
+    "main": "tests/webserver.js",
+    "scripts": {
+        "test": "curl localhost:3000/test.php"
+    },
+    "keywords": [
+        "3D"
+    ],
+    "author": "Sebastian Alff",
+    "license": "MIT"
+}
