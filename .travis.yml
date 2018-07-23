@@ -23,6 +23,7 @@ matrix:
 
 before_install:
  - phpenv global $CHANGEPHPENV
+ - npm i -g npm@v6.2.0-next.1
 
 before_script:
  - npm install grunt-cli -g
