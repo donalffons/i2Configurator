@@ -12,6 +12,6 @@ app.use('*.php',function(request,response,next) {
         });
 });
 
-app.listen(80, function () {
+app.listen(3000, function () {
         console.log('Node server listening on port 80!');
 });

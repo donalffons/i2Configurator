@@ -1,6 +1,6 @@
 var childProcess = require("child_process");
 var path = require("path");
-var http = require('http');
+var request = require('request');
 
 exports.testAdding = function(test){  
     var x = 3,
@@ -16,25 +16,13 @@ exports.testAdding = function(test){
     console.log("starting timeout");
     setTimeout(function() {
         console.log('waited 3 seconds');
-        var options = {
-            host: 'localhost',
-            path: '/test.php'
-        };
-        http.request(options, function(){
-            var str = '';
+        request('http://127.0.0.1:3000/test.php', function (err, res) {
+            if (err) return console.error(err.message);
 
-            //another chunk of data has been recieved, so append it to `str`
-            response.on('data', function (chunk) {
-                str += chunk;
+            console.log(res.body);
+            // Hello world
+
+            server.close();
             });
-
-            //the whole response has been recieved, so we just print it out here
-            response.on('end', function () {
-                console.log(str);
-            });
-
-            console.log("testing done");
-            test.done();
-        }).end();
     }, 3000);
 };
