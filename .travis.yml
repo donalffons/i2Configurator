@@ -9,9 +9,6 @@ node_js:
  - '10'
  - 'node'
 
-before_install:
-  - sudo apt-get install libcurl3-dev
-
 before_script:
  - npm install grunt-cli -g
  - npm install express --save
