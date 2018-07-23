@@ -24,9 +24,9 @@ matrix:
 before_install:
  - phpenv global $CHANGEPHPENV
  - npm i -g npm@v6.2
- - npm install git+https://github.com/gruntjs/grunt-contrib-jshint.git
 
 before_script:
+ - npm install git+https://github.com/gruntjs/grunt-contrib-jshint.git
  - npm install grunt-cli -g
  - npm install express --save
 
