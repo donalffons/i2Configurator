@@ -20,6 +20,7 @@ exports.testAdding = function(test){
             if (err) return console.error(err.message);
 
             console.log(res.body);
+            cp.kill('SIGINT');
         });
     }, 3000);
 };
