@@ -1,6 +1,6 @@
 var childProcess = require("child_process");
 var path = require("path");
-var curl = require('node-curl');
+var http = require('http');
 
 exports.testAdding = function(test){  
     var x = 3,
@@ -14,13 +14,23 @@ exports.testAdding = function(test){
     cp.on("error", console.error.bind(console));
     setTimeout(function() {
         console.log('waited 3 seconds');
-        curl('localhost:3000/test.php', function(err) {
-            console.info(this.status);
-            console.info('-----');
-            console.info(this.body);
-            console.info('-----');
-            console.info(this.info('SIZE_DOWNLOAD'));
-          });
+        var options = {
+            host: 'localhost:3000',
+            path: '/test.php'
+        };
+        http.request(options, function(){
+            var str = '';
+
+            //another chunk of data has been recieved, so append it to `str`
+            response.on('data', function (chunk) {
+                str += chunk;
+            });
+
+            //the whole response has been recieved, so we just print it out here
+            response.on('end', function () {
+                console.log(str);
+            });
+        }).end();
     }, 3000);
 
     test.done();
