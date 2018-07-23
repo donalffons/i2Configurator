@@ -9,13 +9,30 @@ node_js:
 matrix:
  include:
   - name: 'NodeJS latest / PHP 5.6'
-    env: PACKAGENAME=php5.6
+    env: PACKAGENAME=php5
   - name: 'NodeJS latest / PHP 7'
     env: PACKAGENAME=php7.0
 
 before_install:
+  # https://nwdthemes.com/2016/01/31/how-to-upgrade-to-php-5-6-on-debian-7-wheezy/
+  # Add the main repository to your /etc/apt/sources.list file
+ - deb http://packages.dotdeb.org wheezy all
+ - deb-src http://packages.dotdeb.org wheezy all
+ ## PHP 5.6 on Debian 7 “Wheezy” (without Zend thread safety):
+ #- deb http://packages.dotdeb.org wheezy-php56 all
+ #- deb-src http://packages.dotdeb.org wheezy-php56 all
+ # PHP 5.6 on Debian 7 “Wheezy” (with Zend thread safety):
+ - deb http://packages.dotdeb.org wheezy-php56-zts all
+ - deb-src http://packages.dotdeb.org wheezy-php56-zts all
+ # Fetch and install the GnuPG key
+ - wget https://www.dotdeb.org/dotdeb.gpg
+ - sudo apt-key add dotdeb.gpg
+
  - sudo apt-get update
  - sudo apt-get install $PACKAGENAME
+ - wget https://www.dotdeb.org/dotdeb.gpg
+ - sudo apt-key add dotdeb.gpg
+ 
 
 before_script:
  - npm install grunt-cli -g
