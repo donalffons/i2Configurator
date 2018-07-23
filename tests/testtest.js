@@ -32,9 +32,9 @@ exports.testAdding = function(test){
             response.on('end', function () {
                 console.log(str);
             });
+
+            console.log("testing done");
+            test.done();
         }).end();
     }, 3000);
-
-    console.log("testing done");
-    test.done();
 };
