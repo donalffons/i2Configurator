@@ -21,6 +21,7 @@ exports.testAdding = function(test){
 
             console.log(res.body);
             cp.kill('SIGINT');
+            test.done();
         });
     }, 3000);
 };
