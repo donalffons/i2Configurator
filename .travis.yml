@@ -12,6 +12,6 @@ node_js:
 before_script:
  - npm install express --save
 
-script:
- - node tests/webserver.js &
- - curl localhost:3000/test.php
+#script:
+# - node tests/webserver.js &
+# - curl localhost:3000/test.php
