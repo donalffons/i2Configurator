@@ -12,6 +12,7 @@ node_js:
 before_script:
  - npm install grunt-cli -g
  - npm install express --save
+ - npm install node-curl -g
 
 #script:
 # - node tests/webserver.js &
