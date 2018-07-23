@@ -31,8 +31,9 @@ exports.testAdding = async function(test){
             // Login
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
+            var form = await page.$('form');
             await Promise.all([
-                page.click("input[type=submit]"),
+                form.evaluate(form => form.submit()),
                 page.waitForNavigation({ waitUntil: 'networkidle0' }),
             ]);
             bodyHTML = await page.evaluate(() => document.body.innerHTML);
