@@ -24,7 +24,7 @@ matrix:
 before_install:
  - phpenv global $CHANGEPHPENV
  - npm i -g npm@v6.2
- - npm install grunt-contrib-jshint --save-dev
+ - npm install git+https://github.com/gruntjs/grunt-contrib-jshint.git
 
 before_script:
  - npm install grunt-cli -g
