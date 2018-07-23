@@ -31,10 +31,7 @@ exports.testAdding = async function(test){
             // Login
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
-            await page.evaluate(() => {
-                const element = document.querySelector("form");
-                element.submit();
-            });
+            await page.$eval('form', form => form.submit());
             bodyHTML = await page.evaluate(() => document.body.innerHTML);
             console.log(bodyHTML);
             await console.log("-----Click on Dancing Robot Test-----\n");
