@@ -6,7 +6,7 @@ var app = express();
 var execPHP = require('./execphp.js')();
 
 app.use('*.php',function(request,response,next) {
-        execPHP.parseFile(request.originalUrl,function(phpResult) {
+        execPHP.parseFile(request.originalUrl.substr(1),function(phpResult) {
                 response.write(phpResult);
                 response.end();
         });
