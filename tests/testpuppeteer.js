@@ -17,7 +17,7 @@ exports.testAdding = async function(test){
     cp.on("error", console.error.bind(console));
 
     console.log("starting timeout\n");
-    setTimeout(function() {
+    setTimeout(async function() {
         console.log('waited 3 seconds\n');
 
         await (async () => {
