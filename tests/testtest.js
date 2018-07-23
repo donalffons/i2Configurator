@@ -12,6 +12,8 @@ exports.testAdding = function(test){
         console.log("Exited", {code: code, signal: signal});
     });
     cp.on("error", console.error.bind(console));
+
+    console.log("starting timeout");
     setTimeout(function() {
         console.log('waited 3 seconds');
         var options = {
@@ -33,5 +35,6 @@ exports.testAdding = function(test){
         }).end();
     }, 3000);
 
+    console.log("testing done");
     test.done();
 };
