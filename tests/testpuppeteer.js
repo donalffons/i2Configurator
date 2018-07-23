@@ -23,9 +23,9 @@ exports.testAdding = async function(test){
         await (async () => {
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
-            await page.goto('http://127.0.0.1:3000/explorer.php');
+            await page.goto('http://127.0.0.1:3000/explorer.php', {waitUntil: 'networkidle0'});
             let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log("Page content: \n"+bodyHTML);
+            await console.log("Page content: \n"+bodyHTML+"\n");
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
             await page.click(':nth-child(2) > :nth-child(2) > .filename > a');
@@ -35,7 +35,7 @@ exports.testAdding = async function(test){
             await page.click(':nth-child(2) > :nth-child(2) > a');
             await page.goto('http://localhost/I2Configurator/viewer.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title');
             await browser.close()
-        })()
+        })();
 
         console.log('waited 3 seconds\n');
 
