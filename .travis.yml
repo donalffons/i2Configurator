@@ -32,6 +32,7 @@ before_script:
  - npm install grunt-cli -g
  - npm install express --save
  - npm install puppeteer
+ - npm install delay
 
 script:
  - php --version

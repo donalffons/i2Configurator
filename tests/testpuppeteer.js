@@ -4,6 +4,7 @@ var childProcess = require("child_process");
 var path = require("path");
 var request = require('request');
 const puppeteer = require('puppeteer');
+const delay = require('delay');
 
 exports.testAdding = async function(test){  
     var x = 3,
@@ -21,52 +22,46 @@ exports.testAdding = async function(test){
         console.log('waited 3 seconds\n');
 
         await (async () => {
-            var bodyHTML;
             const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.goto('http://127.0.0.1:3000/explorer.php', {waitUntil: 'networkidle0'});
-            bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log(bodyHTML);
-            await console.log("-----Login-----\n");
+
             // Login
+            await console.log("-----Login-----\n");
             await page.type('#fm_usr', 'admin');
             await page.type('#fm_pwd', 'admin');
-            await page.$eval('form', form => form.submit());
-            await page.waitForNavigation({ waitUntil: 'networkidle0' });
-            bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log(bodyHTML);
-            await console.log("-----Click on Dancing Robot Test-----\n");
+            page.$eval('form', form => form.submit());
+            await page.waitForNavigation({ waitUntil: 'networkidle2' });
+            
             // Click on Dancing Robot Test
+            await console.log("-----Click on Dancing Robot Test-----\n");
             await Promise.all([
                 page.click('a[href="?p=Dancing+Robot+Test"]'),
-                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+                page.waitForNavigation({ waitUntil: 'networkidle2' }),
             ]);
-            bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log(bodyHTML);
-            await console.log("-----Click on Edit link-----\n");
+
             // Click on Edit link
+            await console.log("-----Click on Edit link-----\n");
             await Promise.all([
-                page.click('a[href="http://localhost/I2Configurator/editor.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title"]'),
-                page.waitForNavigation({ waitUntil: 'networkidle0' }),
+                page.click('a[href="editor.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title"]'),
+                page.waitForNavigation({ waitUntil: 'networkidle2' }),
             ]);
-            bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log(bodyHTML);
-            await console.log("-----Hover on File-----\n");
+
             // Hover on File
-            await Promise.all([
-                page.hover('div[innerHTML="File"]'),
-                page.waitForNavigation({ waitUntil: 'networkidle0' }),
-            ]);
-            bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log(bodyHTML);
-            await console.log("-----Click on Close-----\n");
+            await console.log("-----Hover on File-----\n");
+            await (await page.$x('//div[normalize-space()="File"]'))[0].hover();
+
+            // Confirm Warning
+            page.on("dialog", (dialog) => {
+                console.log("-----Confirm warning dialog-----\n");
+                dialog.accept();
+            });
+
             // Click on Close
-            await Promise.all([
-                page.click('div[innerHTML="Close"]'),
-                page.waitForNavigation({ waitUntil: 'networkidle0' }),
-            ]);
-            bodyHTML = await page.evaluate(() => document.body.innerHTML);
-            console.log(bodyHTML);
+            await console.log("-----Click on Close-----\n");
+            (await page.$x('//div[normalize-space()="Close"]'))[0].click();
+            await page.waitForNavigation({ waitUntil: 'networkidle2' });
+
             await console.log("-----browser.close()-----\n");
             await browser.close();
         })();
