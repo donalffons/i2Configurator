@@ -17,6 +17,7 @@
         "grunt-php": "^1.5.1"
     },
     "dependencies": {
+        "console-png": "^1.2.1",
         "delay": "^3.0.0",
         "puppeteer": "^1.6.0-next.1532381444032"
     }

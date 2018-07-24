@@ -33,6 +33,7 @@ before_script:
  - npm install express --save
  - npm install puppeteer
  - npm install delay
+ - npm install console-png
 
 script:
  - php --version

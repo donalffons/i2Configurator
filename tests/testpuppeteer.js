@@ -5,6 +5,8 @@ var path = require("path");
 var request = require('request');
 const puppeteer = require('puppeteer');
 const delay = require('delay');
+require('console-png').attachTo(console);
+const fs = require('fs');
 
 exports.testAdding = async function(test){  
     var x = 3,
@@ -46,6 +48,21 @@ exports.testAdding = async function(test){
                 page.click('a[href="editor.html?model=Dancing%20Robot%20Test&variant=No%20Dancing%20Dark%20Blue%20-%20Title"]'),
                 page.waitForNavigation({ waitUntil: 'networkidle2' }),
             ]);
+
+            await page.setViewport({ width: 1280, height: 926 });
+            await page.screenshot({path: 'logo-screenshot.png'});
+            var image = fs.readFileSync('logo-screenshot.png');
+            console.png(image);
+            await page.setViewport({ width: 800, height: 600 });
+            await page.screenshot({path: 'logo-screenshot.png'});
+            await page.screenshot({path: 'logo-screenshot.png'});
+            var image = fs.readFileSync('logo-screenshot.png');
+            console.png(image);
+            await page.setViewport({ width: 500, height: 500 });
+            await page.screenshot({path: 'logo-screenshot.png'});
+            await page.screenshot({path: 'logo-screenshot.png'});
+            var image = fs.readFileSync('logo-screenshot.png');
+            console.png(image);
 
             // Hover on File
             await console.log("-----Hover on File-----\n");
