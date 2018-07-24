@@ -4,11 +4,13 @@ const puppeteer = require('puppeteer');
 const delay = require('delay');
 
 exports.testAdding = async function(test){
+    process.on('unhandledRejection', up => { throw up });
+
     console.log("Waiting 3 seconds for server to load up...\n");
     await delay(3000);
     console.log('Continuing...\n');
 
-    const browser = await puppeteer.launch({devtools: true});
+    const browser = await puppeteer.launch({headless: false});
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(1000*60*5);
     page.on('console', function(msg) { console.log('browser console: ', msg.text()); });
