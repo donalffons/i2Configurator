@@ -11,7 +11,7 @@ exports.testAdding = async function(test){
     await delay(3000);
     console.log('Continuing...\n');
 
-    const browser = await puppeteer.launch({devtools: true});
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     page.setDefaultNavigationTimeout(1000*60*5);
     page.on('console', function(msg) { console.log('browser console: ', msg.text()); });
