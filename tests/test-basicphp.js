@@ -9,12 +9,6 @@ exports.testAdding = function(test){
         y = 2;
     test.equals(x+y, 5, "Test add function");
 
-    var cp = childProcess.fork(path.join(__dirname, "/webserver.js"));
-    cp.on("exit", function (code, signal) {
-        console.log("Exited", {code: code, signal: signal});
-    });
-    cp.on("error", console.error.bind(console));
-
     console.log("starting timeout\n");
     setTimeout(function() {
         console.log('waited 3 seconds\n');
@@ -22,7 +16,6 @@ exports.testAdding = function(test){
             if (err) return console.error(err.message);
 
             console.log(res.body);
-            cp.kill('SIGINT');
             test.done();
         });
     }, 3000);
