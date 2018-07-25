@@ -12,8 +12,17 @@ exports.testAdding = function(test){
     console.log("starting timeout\n");
     setTimeout(function() {
         console.log('waited 3 seconds\n');
-        request('http://127.0.0.1:3000/tests/test.php', function (err, res) {
-            if (err) return console.error(err.message);
+        request('http://127.0.0.1:3000/tests/testbasicphp.php', function (err, res) {
+            if (err) {
+                console.error(err.message);
+                test.ok(false);
+                test.done();
+            }
+            if (res.statusCode >= 400) {
+                console.error("Server status code " + res.statusCode); 
+                test.ok(false);
+                test.done();
+            }
 
             console.log(res.body);
             test.done();
