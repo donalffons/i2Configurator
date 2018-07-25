@@ -12,7 +12,7 @@ exports.testAdding = function(test){
     console.log("starting timeout\n");
     setTimeout(function() {
         console.log('waited 3 seconds\n');
-        request('http://127.0.0.1:3000/tests/testbasicphp.php', function (err, res) {
+        request('http://127.0.0.1:3000/tests/test-basicphp.php', function (err, res) {
             if (err) {
                 console.error(err.message);
                 test.ok(false);

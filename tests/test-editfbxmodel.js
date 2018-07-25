@@ -16,6 +16,7 @@ exports.testAdding = async function(test){
     page.on('console', function(msg) { console.log('browser console: ', msg.text()); });
     page.on("pageerror", function(err) { console.log("browser page error: " + err.toString()); test.ok(false); });
     page.on("error", function(err) { console.log("browser error: " + err.toString()); test.ok(false); });
+    page.on("response", function(response) { console.log("server response: " + response._status); test.ok(response._status <= 400, "server/client error"); });
     await page.goto('http://127.0.0.1:3000/explorer.php', {waitUntil: 'networkidle2'});
 
     // Login
