@@ -5,6 +5,6 @@
 [submodule "crunchdb"]
 	path = crunchdb
 	url = https://github.com/cybrox/crunchdb.git
-[submodule "I2Configurator-Explorer"]
-	path = I2Configurator-Explorer
+[submodule "I2-Configurator-Explorer"]
+	path = I2-Configurator-Explorer
 	url=https://github.com/donalffons/I2Configurator-Explorer.git
