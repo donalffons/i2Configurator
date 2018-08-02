@@ -28,85 +28,28 @@ Menubar.File = function ( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// Load 3D Object
-
-	var option = new UI.Row();
-	option.setClass( 'option' );
-	option.setTextContent( 'Load 3D Object' );
-	option.onClick( function () {
-		var panel = new UI.Panel();
-		panel.add(new UI.Text("Load 3D object from file. " + "Contents of \"" + getParameterByName("model") + "\""));
-		panel.add(new UI.HorizontalRule());
-		$.post(
-			"listDirectory.php",
-			{
-				modelFolder: getParameterByName("model")
-			},
-			function( result )
-			{
-				var files = JSON.parse(result);
-				var checks = [];
-				for (var file in files) {
-					extension = files[file].split( '.' ).pop().toLowerCase();
-					if(["3ds", "amf", "awd", "babylon", "babylonmeshdata", "ctm", "dae", "fbx", "glb", "gltf", "js", "json", "3geo", "3mat", "3obj", "3scn", "kmz", "md2", "obj", "playcanvas", "ply", "stl", "svg", "vtk", "wrl", "zip"].indexOf(extension) == -1) {
-						continue;
-					}
-					var row = new UI.Row();
-					panel.add(row);
-					var check = new UI.Checkbox(false);
-					checks.push(check);
-					check.filename = files[file];
-					row.add(check);
-					if(getCurrentVariant().filenames != null && getCurrentVariant().filenames.indexOf(files[file]) > -1) {
-						check.setValue(true);
-					}
-					row.add(new UI.Text(files[file]));
-				}
-				
-				panel.add(new UI.HorizontalRule());
-				panel.add(new UI.Button( 'OK' ).setMarginLeft( '7px' ).onClick(function(){
-					for(var check in checks) {
-						var currFileName = checks[check].filename;
-						var currFileChecked = checks[check].dom.checked;
-						
-						var currFileObject = editor.scene.children.find(function (e) {
-							if(e.name == currFileName) {
-								return true;
-							}
-							return false;
-						});
-
-						if(currFileObject === undefined && currFileChecked == true) {
-							editor.execute( new Add3DFileCommand( currFileName ) );
-						}
-						if(currFileObject !== undefined && currFileChecked == false) {
-							editor.execute( new Remove3DFileCommand( currFileName ) );
-						}
-						modal.hide();
-					}
-				}));
-				panel.add(new UI.Button( 'Cancel' ).setMarginLeft( '7px' ).onClick(function(){
-					modal.hide();
-				}));
-
-				modal.dom.children[0].style.width = "33%";
-				modal.show(panel);
-			}
-		);
-	} );
-	options.add( option );
-
 	// Save
 
 	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Save' );
 	option.onClick( function () {
-		var variantname = prompt("Please enter file name", currentVariant.name);
-		if (variantname == "") {
-			return;
-		}
-		$.post(
+		$.ajax({
+			url: "I2Configurator.php",
+			type: "POST",
+			data: {
+				api: "saveVariant",
+				variantid: getCurrentVariant().id,
+				action: "autoPropertyChangeList.toJSON()"
+			},
+			dataType: "json",
+			success: function(data){
+				alert(JSON.stringify(data));
+			},
+			error: function() { console.error("Error while getting 3d files by model id"); },
+			complete: function() { }
+		});
+		/*$.post(
 			"save.php",
 			{
 				modelFolder: getParameterByName("model"),
@@ -118,7 +61,7 @@ Menubar.File = function ( editor ) {
 			{
 				// success
 			}
-		);
+		);*/
 	} );
 	options.add( option );
 
@@ -131,7 +74,7 @@ Menubar.File = function ( editor ) {
 		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 			var beforequery = window.location.href.substring(0, window.location.href.lastIndexOf("?"));
 			var basefolder = beforequery.substring(0, beforequery.lastIndexOf("/"));
-			window.location = basefolder+"/explorer.php?p="+getParameterByName("model");
+			window.location = basefolder+"/explorer.php#"+getCurrentModel().path;
 		}
 	} );
 	options.add( option );

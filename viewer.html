@@ -234,10 +234,9 @@
 			onWindowResize();
 
 			//
-			var currentVariant;
 			$(document).ready(function() {
-				LoadFromRequestURL(function(v){
-					currentVariant = v;
+				setCurrentModelAndVariant(function(){
+					LoadCurrentVariant();
 				});
 			});
 

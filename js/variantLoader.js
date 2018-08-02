@@ -3,7 +3,7 @@ function Load3DFile(filename, basefolder) {
         basefolder = getBaseFolder();
     }
     var xhr = new XMLHttpRequest(); 
-    xhr.open("GET", basefolder+"/WebGL Models/"+getParameterByName("model")+"/"+filename);
+    xhr.open("GET",  getModelFolder()+filename);
     xhr.responseType = "blob";
     xhr.filename = filename;
     xhr.onload = function(params) {
@@ -16,42 +16,55 @@ function Load3DFile(filename, basefolder) {
     return objectAddPromise;
 }
 
-function LoadVariant(currentVariant, basefolder) {
-    if (basefolder === undefined) {
-        basefolder = getBaseFolder();
-    }
-    var objectAddPromises = [];
-    if(currentVariant.filenames == null) {
-        return;
-    }
-    for(var i = 0; i < currentVariant.filenames.length; i++) {
-        objectAddPromises.push(Load3DFile(currentVariant.filenames[i]));
-    }
+function get3DFiles(cb) {
+    $.ajax({
+        url: "I2Configurator.php",
+        type: "POST",
+        data: {
+            api: "get3DFilesByModelID",
+            modelid: "1"
+        },
+        dataType: "json",
+        success: function(data){
+            cb(data);
+        },
+        error: function() { console.error("Error while getting 3d files by model id"); },
+        complete: function() { }
+    });
+}
 
-    $.when.apply($, objectAddPromises).done(function(){
-        var propertyChange = JSON.parse(currentVariant.propertyChange);
-        for(var j = 0; j < propertyChange.length; j++) {
-            var sel = propertyChange[j].selector;
-            if(sel.type == "hierarchy") {
-                var obj = editor.scene;
-                for(var k = 1; k < sel.hierarchy.length; k++) {
-                    obj = obj.children.find(function(e) {
-                        if(e.name == sel.hierarchy[k]) {
-                            return true;
-                        }
-                        return false;
-                    })
-                }
-            }
-            var prop = sel.property;
-            var val = propertyChange[j].value;
-            var propSel = new I2Conf.hierarchyPropertySelector(obj, prop);
-            
-            eval("obj."+prop+"_overridden = true;");
-            eval("obj."+prop+"_propSel = propSel;");
-            eval("obj."+prop+".copy(val)");
-            eval("autoPropertyChangeList.addItem(obj."+prop+"_propSel, obj."+prop+");");
+function LoadModelVariant() {
+    get3DFiles(function(filenames) {
+        var objectAddPromises = [];
+        for(var i = 0; i < filenames.length; i++) {
+            objectAddPromises.push(Load3DFile(filenames[i]));
         }
+
+        $.when.apply($, objectAddPromises).done(function(){
+            var action = JSON.parse(currentVariant.action);
+            for(var j = 0; j < action.length; j++) {
+                var sel = action[j].selector;
+                if(sel.type == "hierarchy") {
+                    var obj = editor.scene;
+                    for(var k = 1; k < sel.hierarchy.length; k++) {
+                        obj = obj.children.find(function(e) {
+                            if(e.name == sel.hierarchy[k]) {
+                                return true;
+                            }
+                            return false;
+                        })
+                    }
+                }
+                var prop = sel.property;
+                var val = action[j].value;
+                var propSel = new I2Conf.hierarchyPropertySelector(obj, prop);
+                
+                eval("obj."+prop+"_overridden = true;");
+                eval("obj."+prop+"_propSel = propSel;");
+                eval("obj."+prop+".copy(val)");
+                eval("autoPropertyChangeList.addItem(obj."+prop+"_propSel, obj."+prop+");");
+            }
+        });
     });
 }
 
@@ -61,43 +74,60 @@ function getBaseFolder() {
     return basefolder;
 }
 
+function getModelFolder() {
+    var basefolder = getBaseFolder();
+    return basefolder+"/WebGL Models/"+getCurrentModel().path+"/";
+}
+
 function getCurrentVariantName() {
     var variantname = getParameterByName("variant");
     return variantname;
 }
 
 var currentVariant = {};
-function setCurrentVariant(cb) {
+var currentModel = {};
+function setCurrentModelAndVariant(cb) {
     var variantname = getCurrentVariantName();
     var basefolder = getBaseFolder();
-    $.getJSON(basefolder+"/WebGL Models/"+getParameterByName("model")+"/db/variants.json?"+Math.floor(Math.random()*1000), function(data) {
-        for(var i = 1; i < data.data.length; i++) {
-            if(data.data[i].name == variantname) {
-                currentVariant = data.data[i];
-                var jsonPropChange = JSON.parse(currentVariant.propertyChange);
-                currentVariant.propertyChange = jsonPropChange;
-                cb();
-                break;
-            }
-        }
+    $.ajax({
+        url: "I2Configurator.php",
+        type: "POST",
+        data: {
+            api: "getModelByID",
+            modelid: "1"
+        },
+        dataType: "json",
+        success: function(data){
+            currentModel = data;
+            $.ajax({
+                url: "I2Configurator.php",
+                type: "POST",
+                data: {
+                    api: "getVariantByID",
+                    variantid: "1"
+                },
+                dataType: "json",
+                success: function(data){
+                    currentVariant = data;
+                    cb();
+                },
+                error: function() { console.error("error while loading variant by ID"); },
+                complete: function() { }
+            });
+        },
+        error: function() { console.error("error while loading model by ID"); },
+        complete: function() { }
     });
-    
-    return currentVariant;
 }
 
 function getCurrentVariant() {
     return currentVariant;
 }
 
-function LoadFromRequestURL() {
-    var variantname = getCurrentVariantName();
-    var basefolder = getBaseFolder();
-    $.getJSON(basefolder+"/WebGL Models/"+getParameterByName("model")+"/db/variants.json?"+Math.floor(Math.random()*1000), function(data) {
-        for(var i = 1; i < data.data.length; i++) {
-            if(data.data[i].name == variantname) {
-                LoadVariant(data.data[i], basefolder);
-                break;
-            }
-        }
-    });
+function getCurrentModel() {
+    return currentModel;
+}
+
+function LoadCurrentVariant() {
+    LoadModelVariant(currentModel, currentVariant);
 }

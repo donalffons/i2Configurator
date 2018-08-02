@@ -1029,6 +1029,8 @@ input[name=newpermissions] { padding: 6px 8px; }
 #filetable tbody tr.highlightedItem td:first-child a { outline: none; }
 #filetable tbody tr.selectedItem { background-color: #337ab7; color: #FFF; }
 #filetable tbody tr.selectedItem * a { color: #FFF; }
+#varianttable tbody tr.selectedItem { background-color: #337ab7; color: #FFF; }
+#varianttable tbody tr.selectedItem * a { color: #FFF; }
 #filetable tbody tr td { vertical-align: inherit; }
 
 #navbar { max-width: 100%; }
@@ -1784,6 +1786,7 @@ function IFM( params ) {
 			return;
 		}
 		data.forEach( function( item ) {
+			item.variantid = item.id;
 			item.guid = self.generateGuid();
 			item.linkname = ( item.name == ".." ) ? "[ up ]" : item.name;
 			if( item.name == ".." )
@@ -1961,10 +1964,9 @@ function IFM( params ) {
 					view: {
 						name: self.i18n.view,
 						onClick: function( data ) {
-							//self.editFile( data.clicked.name );
-							alert("TODO: implement viewing!");
+							window.location = "viewer.html?variantid="+data.clicked.variantid;
 						},
-						iconClass: "icon icon-eye_open",
+						iconClass: "icon icon-search",
 						isShown: function( data ) {
 							return !!( self.config.edit && data.clicked.eaction == "edit" && !data.selected.length );
 						}
@@ -1972,8 +1974,7 @@ function IFM( params ) {
 					edit: {
 						name: self.i18n.edit,
 						onClick: function( data ) {
-							//self.editFile( data.clicked.name );
-							alert("TODO: implement editing!");
+							window.location = "editor.html?variantid="+data.clicked.variantid;
 						},
 						iconClass: "icon icon-pencil",
 						isShown: function( data ) {
@@ -3494,7 +3495,7 @@ f00bar;
 		print '<!DOCTYPE HTML>
 		<html>
 			<head>
-				<title>IFM - improved file manager</title>
+				<title>I2 Configurator - Explorer</title>
 				<meta charset="utf-8">
 				<meta http-equiv="X-UA-Compatible" content="IE=edge">
 				<meta name="viewport" content="width=device-width, initial-scale=1">';
