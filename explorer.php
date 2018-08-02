@@ -737,7 +737,9 @@ f00bar;
     "duplicate": "duplicate",
     "view": "view",
     "rename_variant": "Rename Variant",
-    "variant_rename": "Rename umbenennen"
+    "variant_rename": "Rename Variant",
+    "new": "New",
+    "new_variant_name": "New Variant Name"
 }
 
 f00bar;
@@ -1974,7 +1976,7 @@ function IFM( params ) {
 				},
 				actionsGroups:[
 					['view'],
-					['edit', 'rename', 'duplicate'],
+					['new', 'edit', 'rename', 'duplicate'],
 					['delete']
 				],
 				actions: {
@@ -1984,6 +1986,16 @@ function IFM( params ) {
 							window.location = "viewer.html?variantid="+data.clicked.variantid;
 						},
 						iconClass: "icon icon-search",
+						isShown: function( data ) {
+							return !!( self.config.edit && data.clicked.eaction == "edit" && !data.selected.length );
+						}
+					},
+					new: {
+						name: self.i18n.new,
+						onClick: function( data ) {
+							self.showNewVariantDialog(data.clicked);
+						},
+						iconClass: "icon icon-plus",
 						isShown: function( data ) {
 							return !!( self.config.edit && data.clicked.eaction == "edit" && !data.selected.length );
 						}
@@ -2001,7 +2013,6 @@ function IFM( params ) {
 					rename: {
 						name: self.i18n.rename,
 						onClick: function( data ) {
-							alert(JSON.stringify(data));
 							self.showRenameVariantDialog(data.clicked);
 						},
 						iconClass: "icon icon-terminal",
@@ -2350,14 +2361,41 @@ function IFM( params ) {
 		form.elements.newname.addEventListener( 'keypress', function( e ) {
 			if( e.key == 'Enter' ) {
 				e.preventDefault();
-				self.renameVariant("1", variant.action, form.elements.newname.value);
+				self.renameVariant("1", form.elements.newname.value, variant.action);
 				self.hideModal();
 			}
 		});
 		form.addEventListener( 'click', function( e ) {
 			if( e.target.id == 'buttonRename' ) {
 				e.preventDefault();
-				self.renameVariant("1", variant.action, form.elements.newname.value);
+				self.renameVariant("1", form.elements.newname.value, variant.action);
+				self.hideModal();
+			} else if( e.target.id == 'buttonCancel' ) {
+				e.preventDefault();
+				self.hideModal();
+			}
+		});
+	};
+
+	/**
+	 * Show the rename vaariant dialog
+	 *
+	 * @params variantid - variant id
+	 */
+	this.showNewVariantDialog = function( variant ) {
+		self.showModal( Mustache.render( self.templates.renamevariant, { variantname: variant.name, i18n: self.i18n } ) );
+		var form = document.forms.formRenameVariant;
+		form.elements.newname.addEventListener( 'keypress', function( e ) {
+			if( e.key == 'Enter' ) {
+				e.preventDefault();
+				self.newVariant(variant["id model"], form.elements.newname.value, "[]");
+				self.hideModal();
+			}
+		});
+		form.addEventListener( 'click', function( e ) {
+			if( e.target.id == 'buttonRename' ) {
+				e.preventDefault();
+				self.newVariant(variant["id model"], form.elements.newname.value, "[]");
 				self.hideModal();
 			} else if( e.target.id == 'buttonCancel' ) {
 				e.preventDefault();
@@ -2404,6 +2442,30 @@ function IFM( params ) {
 			data: {
 				api: "saveVariant",
 				variantid: id,
+				action: action,
+				name: name
+			},
+			dataType: "json",
+			success: function(){
+			},
+			error: function() { console.error("error while setting variant by ID"); },
+			complete: function() { }
+		});
+	};
+
+	/**
+	 * New variant
+	 *
+	 * @params string name - name of the variant
+	 */
+	this.newVariant = function( modelid, name, action ) {
+		alert("implement new variant");
+		$.ajax({
+			url: "I2Configurator.php",
+			type: "POST",
+			data: {
+				api: "newVariant",
+				modelid: modelid,
 				action: action,
 				name: name
 			},

@@ -63,6 +63,14 @@ if(isset($_POST["api"])) {
         
         echo json_encode("success");
     }
+    if($_POST["api"] == "newVariant") {
+        if(!isset($_POST["action"]) || !isset($_POST["name"]) || !isset($_POST["modelid"])) {
+            error_log("no action or name or model id specified");
+        }
+        $result = $conn->query("INSERT INTO `i2variants` (`id`, `id model`, `action`, `name`) VALUES (NULL, '" . $_POST["modelid"] . "', '" . $_POST["action"] . "', '" . $_POST["name"] . "')");
+
+        echo json_encode($conn->lastInsertId());
+    }
 
     $conn->close();
 } else {
