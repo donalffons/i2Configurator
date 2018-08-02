@@ -538,6 +538,21 @@ f00bar;
 </form>
 
 f00bar;
+$templates['renamevariant'] = <<<'f00bar'
+<form id="formRenameVariant">
+<div class="modal-body">
+	<fieldset>
+		<label>{{i18n.rename_variant}} {{variantname}}:</label>
+		<input class="form-control" type="text" name="newname" value="{{variantname}}" /><br>
+	</fieldset>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" id="buttonRename">{{i18n.file_rename}}</button>
+	<button type="button" class="btn btn-default" id="buttonCancel">{{i18n.cancel}} </button>
+</div>
+</form>
+
+f00bar;
 		$templates['search'] = <<<'f00bar'
 <form id="searchForm">
 <div class="modal-body">
@@ -720,7 +735,9 @@ f00bar;
     "word_wrap": "Word Wrap",
     "variantname": "Variant Name",
     "duplicate": "duplicate",
-    "view": "view"
+    "view": "view",
+    "rename_variant": "Rename Variant",
+    "variant_rename": "Rename umbenennen"
 }
 
 f00bar;
@@ -1984,8 +2001,8 @@ function IFM( params ) {
 					rename: {
 						name: self.i18n.rename,
 						onClick: function( data ) {
-							//self.showRenameFileDialog( data.clicked.name );
-							alert("TODO: implement renaming!");
+							alert(JSON.stringify(data));
+							self.showRenameVariantDialog(data.clicked);
 						},
 						iconClass: "icon icon-terminal",
 						isShown: function( data ) { return !!( self.config.rename && !data.selected.length && data.clicked.name != ".." ); }
@@ -2323,6 +2340,33 @@ function IFM( params ) {
 	};
 
 	/**
+	 * Show the rename vaariant dialog
+	 *
+	 * @params variantid - variant id
+	 */
+	this.showRenameVariantDialog = function( variant ) {
+		self.showModal( Mustache.render( self.templates.renamevariant, { variantname: variant.name, i18n: self.i18n } ) );
+		var form = document.forms.formRenameVariant;
+		form.elements.newname.addEventListener( 'keypress', function( e ) {
+			if( e.key == 'Enter' ) {
+				e.preventDefault();
+				self.renameVariant("1", variant.action, form.elements.newname.value);
+				self.hideModal();
+			}
+		});
+		form.addEventListener( 'click', function( e ) {
+			if( e.target.id == 'buttonRename' ) {
+				e.preventDefault();
+				self.renameVariant("1", variant.action, form.elements.newname.value);
+				self.hideModal();
+			} else if( e.target.id == 'buttonCancel' ) {
+				e.preventDefault();
+				self.hideModal();
+			}
+		});
+	};
+
+	/**
 	 * Renames a file
 	 *
 	 * @params string name - name of the file
@@ -2345,6 +2389,29 @@ function IFM( params ) {
 						} else ifm.showMessage( self.i18n.file_rename_error +data.message, "e");
 					},
 			error: function() { ifm.showMessage( self.i18n.general_error, "e"); }
+		});
+	};
+
+	/**
+	 * Renames a variant
+	 *
+	 * @params string name - name of the variant
+	 */
+	this.renameVariant = function( id, name, action ) {
+		$.ajax({
+			url: "I2Configurator.php",
+			type: "POST",
+			data: {
+				api: "saveVariant",
+				variantid: id,
+				action: action,
+				name: name
+			},
+			dataType: "json",
+			success: function(){
+			},
+			error: function() { console.error("error while setting variant by ID"); },
+			complete: function() { }
 		});
 	};
 
