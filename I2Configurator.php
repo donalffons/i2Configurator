@@ -71,6 +71,17 @@ if(isset($_POST["api"])) {
 
         echo json_encode($conn->insert_id);
     }
+    if($_POST["api"] == "deleteVariantByID") {
+        if(!isset($_POST["variantid"])) {
+            error_log("no variant id specified");
+        }
+
+        foreach($_POST["variantid"] as $variant) {
+            $result = $conn->query("DELETE FROM `i2variants` WHERE id=" . $variant);
+        }
+
+        echo json_encode("success");
+    }
 
     $conn->close();
 } else {

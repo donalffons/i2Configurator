@@ -439,6 +439,23 @@ f00bar;
 </form>
 
 f00bar;
+$templates['deletevariant'] = <<<'f00bar'
+<form id="formDeleteVariants">
+<div class="modal-body">
+	{{#multiple}}
+	<label>{{i18n.variant_delete_confirm}} <code>{{count}}</code>?</label>
+	{{/multiple}}
+	{{^multiple}}
+	<label>{{i18n.variant_delete_confirm}} <code>{{variantname}}</code>?</label>
+	{{/multiple}}
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-danger" id="buttonYes">{{i18n.delete}}</button>
+	<button type="button" class="btn btn-default" id="buttonNo">{{i18n.cancel}}</button>
+</div>
+</form>
+
+f00bar;
 		$templates['extractfile'] = <<<'f00bar'
 <form id="formExtractFile">
 <div class="modal-body">
@@ -754,7 +771,8 @@ f00bar;
     "rename_variant": "Rename Variant",
     "variant_rename": "Rename Variant",
     "new": "New",
-    "new_variant_name": "New Variant Name"
+    "new_variant_name": "New Variant Name",
+    "variant_delete_confirm": "Do you really want to delete the following variant -"
 }
 
 f00bar;
@@ -2054,7 +2072,7 @@ function IFM( params ) {
 								return self.i18n.delete;
 						},
 						onClick: function( data ) {
-							alert("TODO: implement delete!");
+							self.showDeleteVariantDialog( data.clicked );
 						},
 						iconClass: "icon icon-trash",
 						isShown: function( data ) { return !!( self.config.delete && data.clicked.name != ".." ); }
@@ -2339,6 +2357,54 @@ function IFM( params ) {
 	};
 
 	/**
+	 * Shows the delete variant dialog
+	 */
+	this.showDeleteVariantDialog = function( items ) {
+		self.showModal(	Mustache.render( self.templates.deletevariant, {
+			multiple: ( items.length > 1 ),
+			count: items.length,
+			variantname: ( Array.isArray( items ) ? items[0].name : items.name ),
+			i18n: self.i18n
+		}));
+		var form = document.forms.formDeleteVariants;
+		form.addEventListener( 'click', function( e ) {
+			if( e.target.id == 'buttonYes' ) {
+				e.preventDefault();
+				self.deleteVariants( items );
+				self.hideModal();
+			} else if( e.target.id == 'buttonNo' ) {
+				e.preventDefault();
+				self.hideModal();
+			}
+		});
+	};
+
+	/**
+	 * Deletes variants
+	 *
+	 * @params {array} items - array with objects from the variantCache
+	 */
+	this.deleteVariants = function( items ) {
+		if( ! Array.isArray( items ) )
+			items = [items];
+		var ids = [];
+		items.forEach(function(e) {ids.push(e.id);})
+		$.ajax({
+			url: "I2Configurator.php",
+			type: "POST",
+			data: {
+				api: "deleteVariantByID",
+				variantid: ids
+			},
+			dataType: "json",
+			success: function(data){
+			},
+			error: function() { console.error("error while setting variant by ID"); },
+			complete: function() { }
+		});
+	};
+
+	/**
 	 * Show the rename file dialog
 	 *
 	 * @params string name - name of the file
@@ -2485,7 +2551,6 @@ function IFM( params ) {
 			},
 			dataType: "json",
 			success: function(data){
-				alert(JSON.stringify(data));
 			},
 			error: function() { console.error("error while setting variant by ID"); },
 			complete: function() { }
