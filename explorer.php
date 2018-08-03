@@ -25,20 +25,20 @@ class IFM {
 		"selfoverwrite" => 0,
 
 		// api controls
-		"ajaxrequest" => 1,
+		"ajaxrequest" => 0,
 		"chmod" => 1,
 		"copymove" => 1,
-		"createdir" => 1,
-		"createfile" => 1,
+		"createdir" => 0,
+		"createfile" => 0,
 		"edit" => 1,
 		"delete" => 1,
 		"download" => 1,
-		"extract" => 1,
-		"upload" => 1,
-		"remoteupload" => 1,
+		"extract" => 0,
+		"upload" => 0,
+		"remoteupload" => 0,
 		"rename" => 1,
-		"zipnload" => 1,
-		"createarchive" => 1,
+		"zipnload" => 0,
+		"createarchive" => 0,
 
 		// gui controls
 		"showlastmodified" => 0,
@@ -199,7 +199,7 @@ f00bar;
 				</tbody>
 			</table>
 		</div>
-		<div class="container">
+		<div class="container" id="variantcontainer" style="display:none">
 			<table id="varianttable" class="table">
 				<thead>
 					<tr>
@@ -210,8 +210,6 @@ f00bar;
 				<tbody>
 				</tbody>
 			</table>
-		</div>
-		<div class="container">
 			<button type="button" class="btn btn-default" id="buttonNewVariant">
 				<span class="icon icon-plus"></span>{{i18n.create_new_variant}}
 			</button>
@@ -2127,6 +2125,11 @@ function IFM( params ) {
 				self.currentDir = data.realpath;
 				self.refreshFileTable();
 				self.refreshVariantTable();
+				if(self.currentDir == "") {
+					$("#variantcontainer").css("display", "none");
+				} else {
+					$("#variantcontainer").css("display", "block");
+				}
 				$( "#currentDir" ).val( self.currentDir );
 				if( config.pushState ) history.pushState( { dir: self.currentDir }, self.currentDir, "#"+encodeURIComponent( self.currentDir ) );
 			},
