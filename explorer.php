@@ -213,7 +213,7 @@ f00bar;
 		</div>
 		<div class="container">
 			<button type="button" class="btn btn-default" id="buttonNewVariant">
-				<span class="icon icon-plus">{{i18n.create_new_variant}}</span>
+				<span class="icon icon-plus"></span>{{i18n.create_new_variant}}
 			</button>
 		</div>
 		<hr />
