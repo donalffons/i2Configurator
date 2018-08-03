@@ -212,6 +212,12 @@ f00bar;
 			</table>
 		</div>
 		<div class="container">
+			<button type="button" class="btn btn-default" id="buttonNewVariant">
+				<span class="icon icon-plus">{{i18n.create_new_variant}}</span>
+			</button>
+		</div>
+		<hr />
+		<div class="container">
 			<div class="panel panel-default ifminfo"><div class="panel-body">I2 Configurator Explorer</div></div>
 		</div>
 
@@ -774,7 +780,8 @@ f00bar;
     "new_variant_name": "New Variant Name",
     "variant_delete_confirm": "Do you really want to delete the following variant -",
     "duplicate_variant": "Duplicate Variant",
-    "copy_of": "Copy of"
+    "copy_of": "Copy of",
+    "create_new_variant": "Create New Variant"
 }
 
 f00bar;
@@ -3606,6 +3613,23 @@ function IFM( params ) {
 				});
 
 		// bind static buttons
+		document.getElementById( 'buttonNewVariant' ).onclick = function() {
+			$.ajax({
+				url: "I2Configurator.php",
+				type: "POST",
+				data: {
+					api: "getModelByPath",
+					path: self.currentDir,
+				},
+				dataType: "json",
+				success: function(data){
+					var fakevariant = {"id model": data.id};
+					self.showNewVariantDialog(fakevariant);
+				},
+				error: function() { console.error("error while duplicating variant"); },
+				complete: function() { }
+			});
+		};
 		document.getElementById( 'refresh' ).onclick = function() { self.refreshFileTable(); };
 		document.getElementById( 'search' ).onclick = function() { self.showSearchDialog(); };
 		if( self.config.createfile )

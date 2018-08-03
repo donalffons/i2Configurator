@@ -8,6 +8,20 @@ if(isset($_POST["api"])) {
         error_log("Connection failed: " . $conn->connect_error);
     }
     
+    if($_POST["api"] == "getModelByPath") {
+        if(!isset($_POST["path"])) {
+            error_log("no path specified");
+        }
+        
+        $result = $conn->query("SELECT * FROM i2models WHERE path = '" . $_POST["path"] . "'");
+        if ($result->num_rows == 0) {
+            echo json_encode("");
+            exit();
+        }
+		$models = $result->fetch_all(MYSQLI_ASSOC);
+        
+        echo json_encode($models[0]);
+    }
     if($_POST["api"] == "getVariantsByPath") {
         if(!isset($_POST["path"])) {
             error_log("no path specified");
