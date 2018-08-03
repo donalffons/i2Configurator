@@ -69,7 +69,7 @@ if(isset($_POST["api"])) {
         }
         $result = $conn->query("INSERT INTO `i2variants` (`id`, `id model`, `action`, `name`) VALUES (NULL, '" . $_POST["modelid"] . "', '" . $_POST["action"] . "', '" . $_POST["name"] . "')");
 
-        echo json_encode($conn->lastInsertId());
+        echo json_encode($conn->insert_id);
     }
 
     $conn->close();

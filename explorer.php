@@ -553,6 +553,21 @@ $templates['renamevariant'] = <<<'f00bar'
 </form>
 
 f00bar;
+$templates['newvariant'] = <<<'f00bar'
+<form id="formNewVariant">
+<div class="modal-body">
+	<fieldset>
+		<label>{{i18n.new_variant_name}}:</label>
+		<input class="form-control" type="text" name="newname" /><br>
+	</fieldset>
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" id="buttonRename">{{i18n.new}}</button>
+	<button type="button" class="btn btn-default" id="buttonCancel">{{i18n.cancel}} </button>
+</div>
+</form>
+
+f00bar;
 		$templates['search'] = <<<'f00bar'
 <form id="searchForm">
 <div class="modal-body">
@@ -2383,8 +2398,8 @@ function IFM( params ) {
 	 * @params variantid - variant id
 	 */
 	this.showNewVariantDialog = function( variant ) {
-		self.showModal( Mustache.render( self.templates.renamevariant, { variantname: variant.name, i18n: self.i18n } ) );
-		var form = document.forms.formRenameVariant;
+		self.showModal( Mustache.render( self.templates.newvariant, { i18n: self.i18n } ) );
+		var form = document.forms.formNewVariant;
 		form.elements.newname.addEventListener( 'keypress', function( e ) {
 			if( e.key == 'Enter' ) {
 				e.preventDefault();
@@ -2459,7 +2474,6 @@ function IFM( params ) {
 	 * @params string name - name of the variant
 	 */
 	this.newVariant = function( modelid, name, action ) {
-		alert("implement new variant");
 		$.ajax({
 			url: "I2Configurator.php",
 			type: "POST",
@@ -2470,7 +2484,8 @@ function IFM( params ) {
 				name: name
 			},
 			dataType: "json",
-			success: function(){
+			success: function(data){
+				alert(JSON.stringify(data));
 			},
 			error: function() { console.error("error while setting variant by ID"); },
 			complete: function() { }
