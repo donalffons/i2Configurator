@@ -82,6 +82,19 @@ if(isset($_POST["api"])) {
 
         echo json_encode("success");
     }
+    if($_POST["api"] == "duplicateVariants") {
+        if(!isset($_POST["variantid"])) {
+            error_log("no variant id specified");
+        }
+
+        foreach($_POST["variantid"] as $variant) {
+            $result = $conn->query("SELECT * FROM i2variants WHERE id = " . $variant);
+            $template = $result->fetch_all(MYSQLI_ASSOC)[0];
+            $result = $conn->query("INSERT INTO `i2variants` (`id`, `id model`, `action`, `name`) VALUES (NULL, '" . $template["id model"] . "', '" . $template["action"] . "', '". $_POST["prefix"] . $template["name"] . $_POST["postfix"] . "')");
+        }
+
+        echo json_encode("success");
+    }
 
     $conn->close();
 } else {

@@ -772,7 +772,9 @@ f00bar;
     "variant_rename": "Rename Variant",
     "new": "New",
     "new_variant_name": "New Variant Name",
-    "variant_delete_confirm": "Do you really want to delete the following variant -"
+    "variant_delete_confirm": "Do you really want to delete the following variant -",
+    "duplicate_variant": "Duplicate Variant",
+    "copy_of": "Copy of"
 }
 
 f00bar;
@@ -2060,6 +2062,7 @@ function IFM( params ) {
 						},
 						onClick: function( data ) {
 							alert("TODO: implement duplication!");
+							self.duplicateVariants(data.clicked);
 						},
 						iconClass: "icon icon-folder-empty",
 						isShown: function( data ) { return !!( self.config.copymove && data.clicked.name != ".." ); }
@@ -2357,6 +2360,34 @@ function IFM( params ) {
 	};
 
 	/**
+	 * Duplicate variants
+	 *
+	 * @params {array} items - array with objects from the variantCache
+	 */
+	this.duplicateVariants = function( items ) {
+		if( ! Array.isArray( items ) )
+			items = [items];
+		var ids = [];
+		items.forEach(function(e) {ids.push(e.id);})
+		$.ajax({
+			url: "I2Configurator.php",
+			type: "POST",
+			data: {
+				api: "duplicateVariants",
+				variantid: ids,
+				prefix: self.i18n.copy_of + " ",
+				postfix: ""
+			},
+			dataType: "json",
+			success: function(data){
+				alert(JSON.stringify(data));
+			},
+			error: function() { console.error("error while duplicating variant"); },
+			complete: function() { }
+		});
+	};
+
+	/**
 	 * Shows the delete variant dialog
 	 */
 	this.showDeleteVariantDialog = function( items ) {
@@ -2432,7 +2463,7 @@ function IFM( params ) {
 	};
 
 	/**
-	 * Show the rename vaariant dialog
+	 * Show the rename variant dialog
 	 *
 	 * @params variantid - variant id
 	 */
@@ -2459,7 +2490,7 @@ function IFM( params ) {
 	};
 
 	/**
-	 * Show the rename vaariant dialog
+	 * Show the rename variant dialog
 	 *
 	 * @params variantid - variant id
 	 */
