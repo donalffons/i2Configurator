@@ -8,7 +8,7 @@ function Load3DFile(filename, basefolder) {
     xhr.filename = filename;
     xhr.onload = function(params) {
         params.currentTarget.response.name = params.currentTarget.filename;
-        editor.loader.loadFile( params.currentTarget.response, basefolder+"/WebGL Models/"+getParameterByName("model")+"/" , params.currentTarget.objectAddPromise);
+        editor.loader.loadFile( params.currentTarget.response, basefolder+"/WebGL Models/"+getCurrentModel().path+"/" , params.currentTarget.objectAddPromise);
     }
     xhr.objectAddPromise = $.Deferred()
     var objectAddPromise = xhr.objectAddPromise;
