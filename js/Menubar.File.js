@@ -40,11 +40,10 @@ Menubar.File = function ( editor ) {
 			data: {
 				api: "saveVariant",
 				variantid: getCurrentVariant().id,
-				action: "autoPropertyChangeList.toJSON()"
+				action: autoPropertyChangeList.toJSON()
 			},
 			dataType: "json",
 			success: function(data){
-				alert(JSON.stringify(data));
 			},
 			error: function() { console.error("Error while getting 3d files by model id"); },
 			complete: function() { }
