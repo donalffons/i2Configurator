@@ -22,7 +22,7 @@ function get3DFiles(cb) {
         type: "POST",
         data: {
             api: "get3DFilesByModelID",
-            modelid: "1"
+            modelid: getCurrentModel().id
         },
         dataType: "json",
         success: function(data){
@@ -79,43 +79,43 @@ function getModelFolder() {
     return basefolder+"/WebGL Models/"+getCurrentModel().path+"/";
 }
 
-function getCurrentVariantName() {
-    var variantname = getParameterByName("variant");
+function getVariantIDFromRequestURL() {
+    var variantname = getParameterByName("variantid");
     return variantname;
 }
 
 var currentVariant = {};
 var currentModel = {};
 function setCurrentModelAndVariant(cb) {
-    var variantname = getCurrentVariantName();
+    var variantid = getVariantIDFromRequestURL();
     var basefolder = getBaseFolder();
     $.ajax({
         url: "I2Configurator.php",
         type: "POST",
         data: {
-            api: "getModelByID",
-            modelid: "1"
+            api: "getVariantByID",
+            variantid: variantid
         },
         dataType: "json",
         success: function(data){
-            currentModel = data;
+            currentVariant = data;
             $.ajax({
                 url: "I2Configurator.php",
                 type: "POST",
                 data: {
-                    api: "getVariantByID",
-                    variantid: "1"
+                    api: "getModelByID",
+                    modelid: currentVariant["id model"]
                 },
                 dataType: "json",
                 success: function(data){
-                    currentVariant = data;
+                    currentModel = data;
                     cb();
                 },
-                error: function() { console.error("error while loading variant by ID"); },
+                error: function() { console.error("error while loading model by ID"); },
                 complete: function() { }
             });
         },
-        error: function() { console.error("error while loading model by ID"); },
+        error: function() { console.error("error while loading variant by ID"); },
         complete: function() { }
     });
 }
