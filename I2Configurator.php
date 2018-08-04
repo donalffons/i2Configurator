@@ -8,12 +8,21 @@ if(isset($_POST["api"])) {
         error_log("Connection failed: " . $conn->connect_error);
     }
     
+    if($_POST["api"] == "deleteModelsByPath") {
+        if(!isset($_POST["paths"])) {
+            error_log("no paths specified");
+        }
+        
+        foreach($_POST["paths"] as $path) {
+            $result = $conn->query("DELETE FROM `i2models` WHERE path='" . $path . "'");
+        }
+        echo json_encode("success");
+    }
     if($_POST["api"] == "newModel") {
         if(!isset($_POST["path"]) || !isset($_POST["name"])) {
             error_log("no path or name specified");
         }
         
-        error_log("INSERT INTO `i2models` (`id`, `name`, `path`) VALUES (NULL, '" . $_POST["name"] . "', '" . $_POST["path"] . "')");
         $result = $conn->query("INSERT INTO `i2models` (`id`, `name`, `path`) VALUES (NULL, '" . $_POST["name"] . "', '" . $_POST["path"] . "')");
 
         echo json_encode($conn->insert_id);

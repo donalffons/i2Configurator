@@ -786,7 +786,8 @@ f00bar;
     "copy_of": "Copy of",
     "create_new_variant": "Create New Variant",
     "create_new_model": "Create New Model",
-    "filetype_not_allowed": "File type not allowed"
+    "filetype_not_allowed": "File type not allowed",
+    "model_delete_success": "Successfully deleted model"
 }
 
 f00bar;
@@ -2405,8 +2406,29 @@ function IFM( params ) {
 			dataType: "json",
 			success: function( data ) {
 						if( data.status == "OK" ) {
-							self.showMessage( self.i18n.file_delete_success, "s" );
-							self.refreshFileTable();
+							if(self.currentDir == "") {
+								var paths = [];
+								for(var d in items) {
+									paths.push(items[d].name);
+								}
+								$.ajax({
+									url: "I2Configurator.php",
+									type: "POST",
+									data: {
+										api: "deleteModelsByPath",
+										paths: paths,
+									},
+									dataType: "json",
+									success: function(data){
+										self.showMessage( self.i18n.file_delete_success +"<br/>"+self.i18n.model_delete_success, "s" );
+										self.refreshFileTable();},
+									error: function() { console.error("error while duplicating variant"); },
+									complete: function() { }
+								});
+							} else {
+								self.showMessage( self.i18n.file_delete_success, "s" );
+								self.refreshFileTable();
+							}
 						} else self.showMessage( self.i18n.file_delete_error, "e" );
 					},
 			error: function() { self.showMessage( self.i18n.general_error, "e" ); }
