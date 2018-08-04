@@ -8,6 +8,16 @@ if(isset($_POST["api"])) {
         error_log("Connection failed: " . $conn->connect_error);
     }
     
+    if($_POST["api"] == "newModel") {
+        if(!isset($_POST["path"]) || !isset($_POST["name"])) {
+            error_log("no path or name specified");
+        }
+        
+        error_log("INSERT INTO `i2models` (`id`, `name`, `path`) VALUES (NULL, '" . $_POST["name"] . "', '" . $_POST["path"] . "')");
+        $result = $conn->query("INSERT INTO `i2models` (`id`, `name`, `path`) VALUES (NULL, '" . $_POST["name"] . "', '" . $_POST["path"] . "')");
+
+        echo json_encode($conn->insert_id);
+    }
     if($_POST["api"] == "getModelByPath") {
         if(!isset($_POST["path"])) {
             error_log("no path specified");
@@ -28,7 +38,7 @@ if(isset($_POST["api"])) {
         }
         
         $result = $conn->query("SELECT * FROM i2models WHERE path = '" . $_POST["path"] . "'");
-        error_log("SELECT * FROM i2models WHERE path = '" . $_POST["path"] . "'");
+
         if ($result->num_rows == 0) {
             echo json_encode("");
             exit();

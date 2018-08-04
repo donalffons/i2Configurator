@@ -2328,24 +2328,38 @@ function IFM( params ) {
 	 */
 	this.createDir = function( dirname ) {
 		$.ajax({
-			url: self.api,
+			url: "I2Configurator.php",
 			type: "POST",
-			data: ({
-				api: "createDir",
-				dir: self.currentDir,
-				dirname: dirname
-			}),
+			data: {
+				api: "newModel",
+				path: dirname,
+				name: dirname
+			},
 			dataType: "json",
-			success: function( data ){
-					if( data.status == "OK" ) {
-						self.showMessage( self.i18n.folder_create_success, "s" );
-						self.refreshFileTable();
-					}
-					else {
-						self.showMessage( self.i18n.folder_create_error +data.message, "e" );
-					}
-				},
-			error: function() { self.showMessage( self.i18n.general_error, "e" ); }
+			success: function(data){
+				$.ajax({
+					url: self.api,
+					type: "POST",
+					data: ({
+						api: "createDir",
+						dir: self.currentDir,
+						dirname: dirname
+					}),
+					dataType: "json",
+					success: function( data ){
+						if( data.status == "OK" ) {
+							self.showMessage( self.i18n.folder_create_success, "s" );
+							self.refreshFileTable();
+						}
+						else {
+							self.showMessage( self.i18n.folder_create_error +data.message, "e" );
+						}
+					},
+					error: function() { self.showMessage( self.i18n.general_error, "e" ); }
+				});
+			},
+			error: function() { console.error("error while duplicating variant"); },
+			complete: function() { }
 		});
 	};
 
@@ -2602,7 +2616,7 @@ function IFM( params ) {
 			success: function(){
 				self.refreshVariantTable();
 			},
-			error: function() { console.error("error while setting variant by ID"); },
+			error: function() { console.error("error saving variant"); },
 			complete: function() { }
 		});
 	};
@@ -2626,7 +2640,7 @@ function IFM( params ) {
 			success: function(data){
 				self.refreshVariantTable()
 			},
-			error: function() { console.error("error while setting variant by ID"); },
+			error: function() { console.error("error while creating new variant"); },
 			complete: function() { }
 		});
 	};
