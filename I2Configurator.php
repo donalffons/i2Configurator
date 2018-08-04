@@ -1,12 +1,21 @@
 <?php
 
+$servername = "localhost";
+$username = "root";
+$password = "";
+
 if(isset($_POST["api"])) {
-    $conn = new mysqli("localhost", "root", "", "i2configurator");
-    $conn->set_charset("utf8");
-    header("Content-type: text/html;charset=utf-8");
+    $conn = new mysqli("localhost", "root", "");
     if ($conn->connect_error) {
         error_log("Connection failed: " . $conn->connect_error);
+        exit();
     }
+    $result = $conn->query("CREATE DATABASE IF NOT EXISTS i2configurator");
+    $conn->select_db("i2configurator");
+    $conn->set_charset("utf8");
+    $result = $conn->query("CREATE TABLE IF NOT EXISTS `i2models` ( `id` INT NOT NULL AUTO_INCREMENT , `name` TEXT NOT NULL , `path` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = MyISAM;");
+    $result = $conn->query("CREATE TABLE IF NOT EXISTS `i2variants` ( `id` INT NOT NULL AUTO_INCREMENT , `id model` TEXT NOT NULL, `action` TEXT NOT NULL , `name` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = MyISAM;");
+    header("Content-type: text/html;charset=utf-8");
     
     function getModelByPath($conn, $path) {
         if(!isset($path)) {
