@@ -333,12 +333,36 @@ var Loader = function ( editor ) {
 
 					var contents = event.target.result;
 
-					var object = new THREE.OBJLoader().parse( contents );
-					object.name = filename;
+					var MTLPromise = $.Deferred();
+					var mtlfile = filename.substr(0, filename.lastIndexOf("."))+".mtl";
+					var objLoader = new THREE.OBJLoader();
+					$.ajax({
+						url:path+mtlfile,
+						type:'HEAD',
+						error: function()
+						{
+							MTLPromise.resolve();
+						},
+						success: function()
+						{
+							new THREE.MTLLoader()
+							.setPath( path )
+							.load( filename.substr(0, filename.lastIndexOf("."))+".mtl", function ( materials ) {
+								materials.preload();
+								objLoader.setMaterials(materials).setPath(path);
+								MTLPromise.resolve();
+							});
+						}
+					} );
 
-					editor.execute( new AddObjectCommand( object ) );
-
-					promise.resolve();
+					$.when(MTLPromise).then(function(){
+						var object = objLoader.parse(contents);
+						object.name = filename;
+	
+						editor.execute( new AddObjectCommand( object ) );
+	
+						promise.resolve();
+					});
 
 				}, false );
 				reader.readAsText( file );
