@@ -28,13 +28,13 @@ class IFM {
 		"ajaxrequest" => 0,
 		"chmod" => 1,
 		"copymove" => 1,
-		"createdir" => 0,
+		"createdir" => 1,
 		"createfile" => 0,
 		"edit" => 1,
 		"delete" => 1,
 		"download" => 1,
 		"extract" => 0,
-		"upload" => 0,
+		"upload" => 1,
 		"remoteupload" => 0,
 		"rename" => 1,
 		"zipnload" => 0,
@@ -145,9 +145,9 @@ f00bar;
 						{{#config.createfile}}
 						<li><a id="createFile"><span title="{{i18n.file_new}}" class="icon icon-doc-inv"></span> <span class="visible-xs">{{i18n.file_new}}</span></a></li>
 						{{/config.createfile}}
-						{{#config.createdir}}
+						<!--{{#config.createdir}}
 						<li><a id="createDir"><span title="{{i18n.folder_new}}" class="icon icon-folder"></span> <span class="visible-xs">{{i18n.folder_new}}</span></a></li>
-						{{/config.createdir}}
+						{{/config.createdir}}-->
 						<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><span class="icon icon-down-open"></span></a>
 							<ul class="dropdown-menu" role="menu">
 								{{#config.remoteupload}}
@@ -198,6 +198,11 @@ f00bar;
 				<tbody>
 				</tbody>
 			</table>
+			<div class="container" id="modeltoolscontainer">
+				<button type="button" class="btn btn-default" id="buttonNewModel">
+					<span class="icon icon-plus"></span>{{i18n.create_new_model}}
+				</button>
+			</div>
 		</div>
 		<div class="container" id="variantcontainer" style="display:none">
 			<table id="varianttable" class="table">
@@ -779,7 +784,9 @@ f00bar;
     "variant_delete_confirm": "Do you really want to delete the following variant -",
     "duplicate_variant": "Duplicate Variant",
     "copy_of": "Copy of",
-    "create_new_variant": "Create New Variant"
+    "create_new_variant": "Create New Variant",
+    "create_new_model": "Create New Model",
+    "filetype_not_allowed": "File type not allowed"
 }
 
 f00bar;
@@ -1448,6 +1455,12 @@ function IFM( params ) {
 
 	this.filedatatable = null; // Reference for the file data table
 	this.variantdatatable = null; // Reference for the variant  table
+
+	this.allowedfiles = ["png", "jpg", "jpeg", "bmp", "gif", 
+						 "3ds", "amf", "awd", "babylon", "babylonmeshdata", "ctm",
+						 "dae", "fbx", "glb", "gltf", "jf", "json", "3geo", "3mat",
+						 "3obj", "3scn", "kmz", "md2", "obj", "mtl", "playcanvas", "ply",
+						 "stl", "svg", "vtk", "wrl"];
 
 	/**
 	 * Shows a bootstrap modal
@@ -2123,13 +2136,17 @@ function IFM( params ) {
 			dataType: "json",
 			success: function( data ) {
 				self.currentDir = data.realpath;
-				self.refreshFileTable();
-				self.refreshVariantTable();
 				if(self.currentDir == "") {
 					$("#variantcontainer").css("display", "none");
+					$("#upload").css("display", "none");
+					$("#modeltoolscontainer").css("display", "block");
 				} else {
 					$("#variantcontainer").css("display", "block");
+					$("#upload").css("display", "block");
+					$("#modeltoolscontainer").css("display", "none");
 				}
+				self.refreshFileTable();
+				self.refreshVariantTable();
 				$( "#currentDir" ).val( self.currentDir );
 				if( config.pushState ) history.pushState( { dir: self.currentDir }, self.currentDir, "#"+encodeURIComponent( self.currentDir ) );
 			},
@@ -3419,13 +3436,13 @@ function IFM( params ) {
 				}
 				return;
 				break;
-			case 'D':
+			/*case 'D':
 				if( self.config.createdir ) {
 					e.preventDefault();
 					self.showCreateDirDialog();
 				}
 				return;
-				break;
+				break;*/
 			case 'h':
 			case 'ArrowLeft':
 			case 'Backspace':
@@ -3633,12 +3650,15 @@ function IFM( params ) {
 				complete: function() { }
 			});
 		};
+		document.getElementById( 'buttonNewModel' ).onclick = function() {
+			self.showCreateDirDialog();
+		};
 		document.getElementById( 'refresh' ).onclick = function() { self.refreshFileTable(); };
 		document.getElementById( 'search' ).onclick = function() { self.showSearchDialog(); };
 		if( self.config.createfile )
 			document.getElementById( 'createFile' ).onclick = function() { self.showFileDialog(); };
-		if( self.config.createdir )
-			document.getElementById( 'createDir' ).onclick = function() { self.showCreateDirDialog(); };
+		//if( self.config.createdir )
+		//	document.getElementById( 'createDir' ).onclick = function() { self.showCreateDirDialog(); };
 		if( self.config.upload )
 			document.getElementById( 'upload' ).onclick = function() { self.showUploadFileDialog(); };
 		document.getElementById( 'currentDir' ).onkeypress = function( e ) {
@@ -3654,7 +3674,7 @@ function IFM( params ) {
 			document.getElementById( 'buttonAjaxRequest' ).onclick = function() { self.showAjaxRequestDialog(); };
 		if( self.config.upload )
 			document.addEventListener( 'dragover', function( e ) {
-				if( Array.prototype.indexOf.call(e.dataTransfer.types, "Files") != -1 ) {
+				if( self.currentDir != "" && Array.prototype.indexOf.call(e.dataTransfer.types, "Files") != -1 ) {
 					e.preventDefault();
 					e.stopPropagation();
 					var div = document.getElementById( 'filedropoverlay' );
@@ -3664,7 +3684,12 @@ function IFM( params ) {
 						e.stopPropagation();
 						var files = e.dataTransfer.files;
 						for( var i = 0; i < files.length; i++ ) {
-							self.uploadFile( files[i] );
+							var ext = files[i].name.split('.').pop();
+							if(self.allowedfiles.indexOf(ext) != -1) {
+								self.uploadFile( files[i] );
+							} else {
+								self.showMessage( self.i18n.filetype_not_allowed + ": " + files[i].name, "e");
+							}
 						}
 						if( e.target.id == 'filedropoverlay' )
 							e.target.style.display = 'none';
@@ -3681,7 +3706,7 @@ function IFM( params ) {
 				} else {
 					var div = document.getElementById( 'filedropoverlay' );
 					if( div.style.display == 'block' )
-						div.stye.display == 'none';
+						div.stye.display = 'none';
 				}
 			});
 
