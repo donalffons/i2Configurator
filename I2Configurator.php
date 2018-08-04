@@ -8,12 +8,31 @@ if(isset($_POST["api"])) {
         error_log("Connection failed: " . $conn->connect_error);
     }
     
+    function getModelByPath($conn, $path) {
+        if(!isset($path)) {
+            error_log("no path specified");
+        }
+        
+        $result = $conn->query("SELECT * FROM i2models WHERE path = '" . $path . "'");
+        if ($result->num_rows == 0) {
+            echo json_encode("");
+            exit();
+        }
+        $models = $result->fetch_all(MYSQLI_ASSOC);
+        return $models[0];
+    }
+    if($_POST["api"] == "getModelByPath") {
+        echo json_encode(getModelByPath($conn, $_POST["path"]));
+    }
     if($_POST["api"] == "deleteModelsByPath") {
         if(!isset($_POST["paths"])) {
             error_log("no paths specified");
         }
         
         foreach($_POST["paths"] as $path) {
+            $currModel = getModelByPath($conn, $path);
+
+            $result = $conn->query("DELETE FROM `i2variants` WHERE `id model`=" . $currModel["id"]);
             $result = $conn->query("DELETE FROM `i2models` WHERE path='" . $path . "'");
         }
         echo json_encode("success");
@@ -26,20 +45,6 @@ if(isset($_POST["api"])) {
         $result = $conn->query("INSERT INTO `i2models` (`id`, `name`, `path`) VALUES (NULL, '" . $_POST["name"] . "', '" . $_POST["path"] . "')");
 
         echo json_encode($conn->insert_id);
-    }
-    if($_POST["api"] == "getModelByPath") {
-        if(!isset($_POST["path"])) {
-            error_log("no path specified");
-        }
-        
-        $result = $conn->query("SELECT * FROM i2models WHERE path = '" . $_POST["path"] . "'");
-        if ($result->num_rows == 0) {
-            echo json_encode("");
-            exit();
-        }
-		$models = $result->fetch_all(MYSQLI_ASSOC);
-        
-        echo json_encode($models[0]);
     }
     if($_POST["api"] == "getVariantsByPath") {
         if(!isset($_POST["path"])) {
@@ -121,14 +126,16 @@ if(isset($_POST["api"])) {
 
         echo json_encode($conn->insert_id);
     }
-    if($_POST["api"] == "deleteVariantByID") {
-        if(!isset($_POST["variantid"])) {
+    function deleteVariantsByIDs($conn, $variantids) {
+        if(!isset($variantids)) {
             error_log("no variant id specified");
         }
-
-        foreach($_POST["variantid"] as $variant) {
+        foreach($variantids as $variant) {
             $result = $conn->query("DELETE FROM `i2variants` WHERE id=" . $variant);
         }
+    }
+    if($_POST["api"] == "deleteVariantsByIDs") {
+        deleteVariantsByIDs($conn, $_POST["variantid"]);
 
         echo json_encode("success");
     }

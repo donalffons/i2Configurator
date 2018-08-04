@@ -2500,7 +2500,7 @@ function IFM( params ) {
 			url: "I2Configurator.php",
 			type: "POST",
 			data: {
-				api: "deleteVariantByID",
+				api: "deleteVariantsByIDs",
 				variantid: ids
 			},
 			dataType: "json",
