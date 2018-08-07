@@ -3,4 +3,6 @@ os: linux
 files:
   - source: /
     destination: /var/www/html/i2configurator
-    
+hooks:
+  AfterInstall:
+    - location: deploy/afterinstall.sh
