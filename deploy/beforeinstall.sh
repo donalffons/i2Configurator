@@ -4,9 +4,13 @@ cd /var/www/html/
 exec 3>&2
 exec 2> /dev/null
 
+# Create a backup of WebGL Models folder (if exists)
 mv "i2configurator/WebGL Models" "./WebGL Models"
 rm ./i2configurator/* -f -R
 mv "./WebGL Models" "./i2configurator/WebGL Models"
 
 # re-enable errors
 exec 2>&3
+
+# copy configuration file
+cp /home/ec2-user/i2configurator.conf ./i2configurator

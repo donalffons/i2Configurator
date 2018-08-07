@@ -5,7 +5,16 @@ $username = "root";
 $password = "";
 
 if(isset($_POST["api"])) {
-    $conn = new mysqli("localhost", "root", "");
+    // read login data
+    $f = fopen("i2configurator.conf", 'r');
+    $line = fgets($f);
+    fclose($f);
+    $login = preg_split('/:/', $line);
+    $dbaddress = $login[0];
+    $username = $login[1];
+    $password = $login[2];
+
+    $conn = new mysqli($dbaddress, $username, $password);
     if ($conn->connect_error) {
         error_log("Connection failed: " . $conn->connect_error);
         exit();
