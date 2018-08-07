@@ -9,8 +9,8 @@ mv "i2configurator/WebGL Models" "./WebGL Models"
 rm ./i2configurator/* -f -R
 mv "./WebGL Models" "./i2configurator/WebGL Models"
 
+# copy configuration file (if exists)
+cp /home/ec2-user/i2configurator-conf.php ./i2configurator
+
 # re-enable errors
 exec 2>&3
-
-# copy configuration file
-cp /home/ec2-user/i2configurator-conf.php ./i2configurator
