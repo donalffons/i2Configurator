@@ -1,20 +1,9 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "";
+require("i2configurator-conf.php");
 
 if(isset($_POST["api"])) {
-    // read login data
-    $f = fopen("i2configurator.conf", 'r');
-    $line = fgets($f);
-    fclose($f);
-    $login = preg_split('/:/', $line);
-    $dbaddress = $login[0];
-    $username = $login[1];
-    $password = $login[2];
-
-    $conn = new mysqli($dbaddress, $username, $password);
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD);
     if ($conn->connect_error) {
         error_log("Connection failed: " . $conn->connect_error);
         exit();

@@ -13,4 +13,4 @@ mv "./WebGL Models" "./i2configurator/WebGL Models"
 exec 2>&3
 
 # copy configuration file
-cp /home/ec2-user/i2configurator.conf ./i2configurator
+cp /home/ec2-user/i2configurator-conf.php ./i2configurator
