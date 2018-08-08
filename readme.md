@@ -5,14 +5,22 @@
 Uploader and configurator for 3D models for the web.
 More info coming soon...
 
-## Test environment
-https://interactiveimpressions.com/i2configurator/explorer.php
+[Test environment](https://interactiveimpressions.com/i2configurator/explorer.php). Feel free to mess around with it!
 
 ## Installation
-To Do!
+This project is using [AWS CodeDeploy](https://aws.amazon.com/de/codedeploy/) for automatic deployment on the production server. The following files are used during deployment:
+* ./appspec.yml
+* ./deploy/beforeinstall.sh
+* ./deploy/afterinstall.sh
 
-aws code deploy
+### Requirements
+* HTTP Server
+* PHP
+* MySQL database
 
-configuration script in /home/ec2-user
+This project will automatically generate the *i2configurator* database and all required tables, if they don't exist.
 
-Create script to create default database configuration
+### Configuration
+The database connection information have to be edited in the database configuration script in ./i2database-conf.php.
+
+If the database configuration script is present in the folder /home/ec2-user/, it will be copied and overwrites the default one.
