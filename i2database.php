@@ -1,6 +1,6 @@
 <?php
 
-require("i2configurator-conf.php");
+require("i2database-conf.php");
 
 if(isset($_POST["api"])) {
     $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD);

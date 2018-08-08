@@ -35,7 +35,7 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Save' );
 	option.onClick( function () {
 		$.ajax({
-			url: "I2Configurator.php",
+			url: "i2database.php",
 			type: "POST",
 			data: {
 				api: "saveVariant",

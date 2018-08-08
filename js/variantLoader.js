@@ -18,7 +18,7 @@ function Load3DFile(filename, basefolder) {
 
 function get3DFiles(cb) {
     $.ajax({
-        url: "I2Configurator.php",
+        url: "i2database.php",
         type: "POST",
         data: {
             api: "get3DFilesByModelID",
@@ -90,7 +90,7 @@ function setCurrentModelAndVariant(cb) {
     var variantid = getVariantIDFromRequestURL();
     var basefolder = getBaseFolder();
     $.ajax({
-        url: "I2Configurator.php",
+        url: "i2database.php",
         type: "POST",
         data: {
             api: "getVariantByID",
@@ -100,7 +100,7 @@ function setCurrentModelAndVariant(cb) {
         success: function(data){
             currentVariant = data;
             $.ajax({
-                url: "I2Configurator.php",
+                url: "i2database.php",
                 type: "POST",
                 data: {
                     api: "getModelByID",
