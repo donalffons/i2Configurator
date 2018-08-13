@@ -1,10 +1,10 @@
 <?php
 
-chdir("I2Configurator-Explorer/");
+chdir("i2ConfiguratorExplorer/");
 
 include("compiler.php");
 chdir("../");
 
-copy("I2Configurator-Explorer/ifm.php", "explorer.php");
+copy("i2ConfiguratorExplorer/ifm.php", "explorer.php");
 
 ?>
