@@ -1459,7 +1459,7 @@ function IFM( params ) {
 
 	this.allowedfiles = ["png", "jpg", "jpeg", "bmp", "gif", 
 						 "3ds", "amf", "awd", "babylon", "babylonmeshdata", "ctm",
-						 "dae", "fbx", "glb", "gltf", "jf", "json", "3geo", "3mat",
+						 "dae", "fbx", "glb", "gltf", "bin", "jf", "json", "3geo", "3mat",
 						 "3obj", "3scn", "kmz", "md2", "obj", "mtl", "playcanvas", "ply",
 						 "stl", "svg", "vtk", "wrl"];
 
