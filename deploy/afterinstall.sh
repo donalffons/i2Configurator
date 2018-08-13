@@ -9,7 +9,7 @@ exec 3>&2
 exec 2> /dev/null
 
 # copy configuration file (if exists)
-cp /home/ec2-user/i2database-conf.php ./i2configurator/i2database-conf.php
+cp /home/ec2-user/i2database-conf.php .
 
 # re-enable errors
 exec 2>&3
