@@ -1543,11 +1543,13 @@ function IFM( params ) {
 		self.task_add( { id: taskid, name: self.i18n.refresh } );
 		let currentModelPromise = i2ModelBuilder.getModelByPath(self.currentDir);
 		currentModelPromise.then(async (currentModel) => {
-			let variants = await currentModel.getVariants();
-	
-			self.rebuildVariantTable(variants);
-			self.task_done( taskid );
-		}, (e) => {
+			let variantsPromise = currentModel.getVariants();
+			variantsPromise.then((variants) => {
+				self.rebuildVariantTable(variants);
+			}, () => {
+				self.rebuildVariantTable([]);
+			});
+		}).then(() => {
 			self.task_done( taskid );
 		});
 	};
@@ -2314,20 +2316,12 @@ function IFM( params ) {
 								for(var d in items) {
 									paths.push(items[d].name);
 								}
-								$.ajax({
-									url: "i2database.php",
-									type: "POST",
-									data: {
-										api: "deleteModelsByPath",
-										paths: paths,
-									},
-									dataType: "json",
-									success: function(data){
-										self.showMessage( self.i18n.file_delete_success +"<br/>"+self.i18n.model_delete_success, "s" );
-										self.refreshFileTable();},
-									error: function() { console.error("error while duplicating variant"); },
-									complete: function() { }
-								});
+								paths.forEach(async (p) => {
+									let delModel = await i2ModelBuilder.getModelByPath(p);
+									await delModel.delete();
+									self.showMessage( self.i18n.model_delete_success, "s" );
+									self.refreshFileTable();
+								})
 							} else {
 								self.showMessage( self.i18n.file_delete_success, "s" );
 								self.refreshFileTable();
@@ -2343,26 +2337,17 @@ function IFM( params ) {
 	 *
 	 * @params {array} items - array with objects from the variantCache
 	 */
-	this.duplicateVariants = function( items ) {
-		if( ! Array.isArray( items ) )
-			items = [items];
-		var ids = [];
-		items.forEach(function(e) {ids.push(e.id);})
-		$.ajax({
-			url: "i2database.php",
-			type: "POST",
-			data: {
-				api: "duplicateVariants",
-				variantid: ids,
-				prefix: self.i18n.copy_of + " ",
-				postfix: ""
-			},
-			dataType: "json",
-			success: function(data){
-				self.refreshVariantTable();
-			},
-			error: function() { console.error("error while duplicating variant"); },
-			complete: function() { }
+	this.duplicateVariants = function( variants ) {
+		if( ! Array.isArray( variants ) )
+			variants = [variants];
+		variants.forEach(async(variant) => {
+			let newVariant = await i2VariantBuilder.createNewVariant();
+			let newVariantID = newVariant.getID();
+			newVariant.data = variant.data;
+			newVariant.setID(newVariantID);
+			newVariant.setName(newVariant.getName() + " - copy");
+			newVariant.save();
+			self.refreshVariantTable();
 		});
 	};
 
@@ -2394,24 +2379,12 @@ function IFM( params ) {
 	 *
 	 * @params {array} items - array with objects from the variantCache
 	 */
-	this.deleteVariants = function( items ) {
-		if( ! Array.isArray( items ) )
-			items = [items];
-		var ids = [];
-		items.forEach(function(e) {ids.push(e.id);})
-		$.ajax({
-			url: "i2database.php",
-			type: "POST",
-			data: {
-				api: "deleteVariantsByIDs",
-				variantid: ids
-			},
-			dataType: "json",
-			success: function(data){
-				self.refreshVariantTable();
-			},
-			error: function() { console.error("error while deleting variant by ID"); },
-			complete: function() { }
+	this.deleteVariants = function( variants ) {
+		if( ! Array.isArray( variants ) )
+			variants = [variants];
+		variants.forEach(async(variant) => {
+			await variant.delete();
+			self.refreshVariantTable();
 		});
 	};
 
@@ -2453,14 +2426,14 @@ function IFM( params ) {
 		form.elements.newname.addEventListener( 'keypress', function( e ) {
 			if( e.key == 'Enter' ) {
 				e.preventDefault();
-				self.renameVariant(variant.id, form.elements.newname.value, variant.action);
+				self.renameVariant(variant, form.elements.newname.value);
 				self.hideModal();
 			}
 		});
 		form.addEventListener( 'click', function( e ) {
 			if( e.target.id == 'buttonRename' ) {
 				e.preventDefault();
-				self.renameVariant(variant.id, form.elements.newname.value, variant.action);
+				self.renameVariant(variant, form.elements.newname.value);
 				self.hideModal();
 			} else if( e.target.id == 'buttonCancel' ) {
 				e.preventDefault();
@@ -2530,23 +2503,10 @@ function IFM( params ) {
 	 *
 	 * @params string name - name of the variant
 	 */
-	this.renameVariant = function( id, name, action ) {
-		$.ajax({
-			url: "i2database.php",
-			type: "POST",
-			data: {
-				api: "saveVariant",
-				variantid: id,
-				action: action,
-				name: name
-			},
-			dataType: "json",
-			success: function(){
-				self.refreshVariantTable();
-			},
-			error: function() { console.error("error saving variant"); },
-			complete: function() { }
-		});
+	this.renameVariant = async function( variant, name ) {
+		variant.setName(name);
+		await variant.save();
+		self.refreshVariantTable();
 	};
 
 	/**
