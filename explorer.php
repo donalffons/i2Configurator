@@ -1538,22 +1538,18 @@ function IFM( params ) {
 	/**
 	 * Refreshes the file table
 	 */
-	this.refreshVariantTable = function () {
+	this.refreshVariantTable = async function () {
 		var taskid = self.generateGuid();
 		self.task_add( { id: taskid, name: self.i18n.refresh } );
-		$.ajax({
-			url: "i2database.php",
-			type: "POST",
-			data: {
-				api: "getVariantsByPath",
-				path: self.currentDir
-			},
-			dataType: "json",
-			success: function(data) {
-				self.rebuildVariantTable(data);
-			},
-			error: function() { self.showMessage( self.i18n.general_error, "e" ); },
-			complete: function() { self.task_done( taskid ); }
+		let currentModel = i2ModelBuilder.getModelByPath(self.currendDir);
+		currentModel.then(async () => {
+			let variants = await currentModel.getVariants();
+	
+			self.rebuildVariantTable(variants);
+			self.task_done( taskid );
+		}, (e) => {
+			self.showMessage( 'no current model', "e" );
+			self.task_done( taskid );
 		});
 	};
 
