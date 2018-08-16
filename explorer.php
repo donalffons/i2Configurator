@@ -646,7 +646,7 @@ f00bar;
 f00bar;
 		$templates['varianttable'] = <<<'f00bar'
 {{#items}}
-<tr class="clickable-variant-row {{rowclasses}}" {{{dragdrop}}} data-id="{{guid}}" data-filename="{{name}}" data-eaction="{{eaction}}">
+<tr class="clickable-variant-row {{rowclasses}}" {{{dragdrop}}} data-id="{{guid}}" data-variantname="{{data.name}}" data-eaction="{{eaction}}">
 	{{#fixtop}}
 	<td data-order="{{fixtop}}"></td>
 	{{/fixtop}}
@@ -656,7 +656,7 @@ f00bar;
 	<td>
 		<a {{{href}}} tabindex="0" id="{{guid}}" class="ifmitem" {{{tooltip}}} data-type="{{type}}">
 			<span class="{{icon}}"></span>
-			{{name}}
+			{{data.name}}
 		</a>
 	</td>
 </tr>
@@ -1538,17 +1538,16 @@ function IFM( params ) {
 	/**
 	 * Refreshes the file table
 	 */
-	this.refreshVariantTable = async function () {
+	this.refreshVariantTable = function () {
 		var taskid = self.generateGuid();
 		self.task_add( { id: taskid, name: self.i18n.refresh } );
-		let currentModel = i2ModelBuilder.getModelByPath(self.currendDir);
-		currentModel.then(async () => {
+		let currentModelPromise = i2ModelBuilder.getModelByPath(self.currentDir);
+		currentModelPromise.then(async (currentModel) => {
 			let variants = await currentModel.getVariants();
 	
 			self.rebuildVariantTable(variants);
 			self.task_done( taskid );
 		}, (e) => {
-			self.showMessage( 'no current model', "e" );
 			self.task_done( taskid );
 		});
 	};
@@ -1855,90 +1854,18 @@ function IFM( params ) {
 	 *
 	 * @param object data - object with items
 	 */
-	this.rebuildVariantTable = function( data ) {
-		if(data == "") { // e.g. root directory
-			data = [];
-		}
-		if( data.status == "ERROR" ) {
-			this.showMessage( data.message, "e" );
-			return;
-		}
-		data.forEach( function( item ) {
-			item.variantid = item.id;
+	this.rebuildVariantTable = function( variants ) {
+		variants.forEach( function( item ) {
+			item.variantid = item.data.id;
 			item.guid = self.generateGuid();
-			item.linkname = ( item.name == ".." ) ? "[ up ]" : item.name;
-			if( item.name == ".." )
-				item.fixtop = 100;
-			item.download = {};
-			item.download.name = ( item.name == ".." ) ? "." : item.name;
-			item.download.currentDir = self.currentDir;
-			if( self.config.isDocroot )
-				item.href = 'href=editor.html?model="'+self.currentDir+'"';
-			if( ! self.config.chmod )
-				item.readonly = "readonly";
-			if( self.config.edit || self.config.rename || self.config.delete || self.config.extract || self.config.copymove ) {
-				item.ftbuttons = true;
-				item.button = [];
-			}
-			if( item.type == "dir" ) {
-				if( self.config.download && self.config.zipnload ) {
-					item.download.action = "zipnload";
-					item.download.icon = "icon icon-download-cloud";
-				}
-				item.rowclasses = "isDir";
-			} else {
-				if( self.config.download && self.config.zipnload ) {
-					item.download.action = "download";
-					item.download.icon = "icon icon-download";
-				}
-				if( item.icon !== undefined && item.icon.indexOf( 'file-image' ) !== -1  ) {
-					item.tooltip = 'data-toggle="tooltip"';
-				}
-				if( self.config.extract && self.inArray( item.ext, ["zip","tar","tgz","tar.gz","tar.xz","tar.bz2"] ) ) {
-					item.eaction = "extract";
-					item.button.push({
-						action: "extract",
-						icon: "icon icon-archive",
-						title: "extract"
-					});
-				} else if(self.config.edit) {
-					item.eaction = "edit";
-					item.button.push({
-						action: "edit",
-						icon: "icon icon-pencil",
-						title: "edit"
-					});
-				}
-			}
-			if( ! self.inArray( item.name, [".", ".."] ) ) {
-				item.dragdrop = 'draggable="true"';
-				if( self.config.copymove )
-					item.button.push({
-						action: "copymove",
-						icon: "icon icon-folder-open-empty",
-						title: "copy/move"
-					});
-				if( self.config.rename )
-					item.button.push({
-						action: "rename",
-						icon: "icon icon-terminal",
-						title: "rename"
-					});
-				if( self.config.delete )
-					item.button.push({
-						action: "delete",
-						icon: "icon icon-trash",
-						title: "delete"
-					});
-			}
 		});
 
 		// save items to file cache
-		self.variantCache = data;
+		self.variantCache = variants;
 
 
 		// build new tbody and replace the old one with the new
-		var newTBody = Mustache.render( self.templates.varianttable, { items: data, config: self.config, i18n: self.i18n, api: self.api } );
+		var newTBody = Mustache.render( self.templates.varianttable, { items: variants, config: self.config, i18n: self.i18n, api: self.api } );
 		var filetable = document.getElementById( 'varianttable' );
 		filetable.tBodies[0].remove();
 		filetable.append( document.createElement( 'tbody' ) );
@@ -1957,7 +1884,6 @@ function IFM( params ) {
 				"search": self.i18n.filter
 			}
 		});
-
 
 		// add event listeners
 		filetable.tBodies[0].addEventListener( 'keypress', function( e ) {
@@ -2044,38 +1970,28 @@ function IFM( params ) {
 						onClick: function( data ) {
 							window.location = "viewer.html?variantid="+data.clicked.variantid;
 						},
-						iconClass: "icon icon-search",
-						isShown: function( data ) {
-							return !!( self.config.edit && data.clicked.eaction == "edit" && !data.selected.length );
-						}
+						iconClass: "icon icon-search"
 					},
 					new: {
 						name: self.i18n.new,
 						onClick: function( data ) {
-							self.showNewVariantDialog(data.clicked);
+							self.showNewVariantDialog();
 						},
-						iconClass: "icon icon-plus",
-						isShown: function( data ) {
-							return !!( self.config.edit && data.clicked.eaction == "edit" && !data.selected.length );
-						}
+						iconClass: "icon icon-plus"
 					},
 					edit: {
 						name: self.i18n.edit,
 						onClick: function( data ) {
 							window.location = "editor.html?variantid="+data.clicked.variantid;
 						},
-						iconClass: "icon icon-pencil",
-						isShown: function( data ) {
-							return !!( self.config.edit && data.clicked.eaction == "edit" && !data.selected.length );
-						}
+						iconClass: "icon icon-pencil"
 					},
 					rename: {
 						name: self.i18n.rename,
 						onClick: function( data ) {
 							self.showRenameVariantDialog(data.clicked);
 						},
-						iconClass: "icon icon-terminal",
-						isShown: function( data ) { return !!( self.config.rename && !data.selected.length && data.clicked.name != ".." ); }
+						iconClass: "icon icon-terminal"
 					},
 					duplicate: {
 						name: function( data ) {
@@ -2091,8 +2007,7 @@ function IFM( params ) {
 								self.duplicateVariants(data.clicked);
 							}
 						},
-						iconClass: "icon icon-folder-empty",
-						isShown: function( data ) { return !!( self.config.copymove && data.clicked.name != ".." ); }
+						iconClass: "icon icon-folder-empty"
 					},
 					delete: {
 						name: function( data ) {
@@ -2108,8 +2023,7 @@ function IFM( params ) {
 								self.showDeleteVariantDialog( data.clicked );
 							}
 						},
-						iconClass: "icon icon-trash",
-						isShown: function( data ) { return !!( self.config.delete && data.clicked.name != ".." ); }
+						iconClass: "icon icon-trash"
 					}
 				}
 			});
@@ -2327,40 +2241,29 @@ function IFM( params ) {
 	/**
 	 * Create a directory
 	 */
-	this.createDir = function( dirname ) {
+	this.createDir = async function( dirname ) {
+		let newModel = await i2ModelBuilder.createNewModel();
+		newModel.setName(dirname);
+		await newModel.save();
 		$.ajax({
-			url: "i2database.php",
+			url: self.api,
 			type: "POST",
-			data: {
-				api: "newModel",
-				path: dirname,
-				name: dirname
-			},
+			data: ({
+				api: "createDir",
+				dir: self.currentDir,
+				dirname: newModel.getPath()
+			}),
 			dataType: "json",
-			success: function(data){
-				$.ajax({
-					url: self.api,
-					type: "POST",
-					data: ({
-						api: "createDir",
-						dir: self.currentDir,
-						dirname: dirname
-					}),
-					dataType: "json",
-					success: function( data ){
-						if( data.status == "OK" ) {
-							self.showMessage( self.i18n.folder_create_success, "s" );
-							self.refreshFileTable();
-						}
-						else {
-							self.showMessage( self.i18n.folder_create_error +data.message, "e" );
-						}
-					},
-					error: function() { self.showMessage( self.i18n.general_error, "e" ); }
-				});
+			success: function( data ){
+				if( data.status == "OK" ) {
+					self.showMessage( self.i18n.folder_create_success, "s" );
+					self.refreshFileTable();
+				}
+				else {
+					self.showMessage( self.i18n.folder_create_error +data.message, "e" );
+				}
 			},
-			error: function() { console.error("error while duplicating variant"); },
-			complete: function() { }
+			error: function() { self.showMessage( self.i18n.general_error, "e" ); }
 		});
 	};
 
@@ -2571,25 +2474,28 @@ function IFM( params ) {
 	 *
 	 * @params variantid - variant id
 	 */
-	this.showNewVariantDialog = function( variant ) {
-		self.showModal( Mustache.render( self.templates.newvariant, { i18n: self.i18n } ) );
-		var form = document.forms.formNewVariant;
-		form.elements.newname.addEventListener( 'keypress', function( e ) {
-			if( e.key == 'Enter' ) {
-				e.preventDefault();
-				self.newVariant(variant["id model"], form.elements.newname.value, "[]");
-				self.hideModal();
-			}
-		});
-		form.addEventListener( 'click', function( e ) {
-			if( e.target.id == 'buttonRename' ) {
-				e.preventDefault();
-				self.newVariant(variant["id model"], form.elements.newname.value, "[]");
-				self.hideModal();
-			} else if( e.target.id == 'buttonCancel' ) {
-				e.preventDefault();
-				self.hideModal();
-			}
+	this.showNewVariantDialog = function() {
+		let currentModelPromise = i2ModelBuilder.getModelByPath(self.currentDir);
+		currentModelPromise.then((currentModel) => {
+			self.showModal( Mustache.render( self.templates.newvariant, { i18n: self.i18n } ) );
+			var form = document.forms.formNewVariant;
+			form.elements.newname.addEventListener( 'keypress', function( e ) {
+				if( e.key == 'Enter' ) {
+					e.preventDefault();
+					self.newVariant(currentModel, form.elements.newname.value);
+					self.hideModal();
+				}
+			});
+			form.addEventListener( 'click', function( e ) {
+				if( e.target.id == 'buttonRename' ) {
+					e.preventDefault();
+					self.newVariant(currentModel, form.elements.newname.value);
+					self.hideModal();
+				} else if( e.target.id == 'buttonCancel' ) {
+					e.preventDefault();
+					self.hideModal();
+				}
+			});
 		});
 	};
 
@@ -2648,23 +2554,12 @@ function IFM( params ) {
 	 *
 	 * @params string name - name of the variant
 	 */
-	this.newVariant = function( modelid, name, action ) {
-		$.ajax({
-			url: "i2database.php",
-			type: "POST",
-			data: {
-				api: "newVariant",
-				modelid: modelid,
-				action: action,
-				name: name
-			},
-			dataType: "json",
-			success: function(data){
-				self.refreshVariantTable()
-			},
-			error: function() { console.error("error while creating new variant"); },
-			complete: function() { }
-		});
+	this.newVariant = async function( model, name ) {
+		let newVariant = await i2VariantBuilder.createNewVariant();
+		newVariant.setName(name);
+		newVariant.addModelID(model.getID());
+		await newVariant.save();
+		this.refreshVariantTable();
 	};
 
 	/**
@@ -3670,21 +3565,7 @@ function IFM( params ) {
 
 		// bind static buttons
 		document.getElementById( 'buttonNewVariant' ).onclick = function() {
-			$.ajax({
-				url: "i2database.php",
-				type: "POST",
-				data: {
-					api: "getModelByPath",
-					path: self.currentDir,
-				},
-				dataType: "json",
-				success: function(data){
-					var fakevariant = {"id model": data.id};
-					self.showNewVariantDialog(fakevariant);
-				},
-				error: function() { console.error("error while duplicating variant"); },
-				complete: function() { }
-			});
+			self.showNewVariantDialog();
 		};
 		document.getElementById( 'buttonNewModel' ).onclick = function() {
 			self.showCreateDirDialog();
