@@ -1,10 +1,11 @@
 <?php
 
-chdir("I2Configurator-Explorer/");
+echo getcwd() . "<br/>";
+chdir("I2ConfiguratorExplorer/");
 
 include("compiler.php");
 chdir("../");
 
-copy("I2Configurator-Explorer/ifm.php", "explorer.php");
+copy("I2ConfiguratorExplorer/ifm.php", "explorer.php");
 
 ?>
