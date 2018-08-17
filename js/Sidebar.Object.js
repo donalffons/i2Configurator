@@ -380,9 +380,11 @@ Sidebar.Object = function ( editor ) {
 			}
 
 			if(objectPositionOverride.dom.checked && !object.position_overridden) {
-				editor.execute(new AddVariantCommand(object, "position"));
+				object.position_overridden = true;
+				editor.execute(new AddActionObjectPropertyCommand(object, "position", object.position, (action) => {object.position_autoAction = action; alert('updated');}));
 			} else if (!objectPositionOverride.dom.checked && object.position_overridden) {
-				editor.execute(new RemoveVariantCommand(object, "position"));
+				object.position_overridden = false;
+				editor.execute(new RemoveActionObjectPropertyCommand(object.position_autoAction, () => {object.position_autoAction = null;}));
 			}
 
 			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
@@ -393,9 +395,9 @@ Sidebar.Object = function ( editor ) {
 			}
 			
 			if(objectRotationOverride.dom.checked && !object.rotation_overridden) {
-				editor.execute(new AddVariantCommand(object, "rotation"));
+				editor.execute(new AddActionObjectPropertyCommand(object, "rotation", object.rotation));
 			} else if (!objectRotationOverride.dom.checked && object.rotation_overridden) {
-				editor.execute(new RemoveVariantCommand(object, "rotation"));
+				editor.execute(new RemoveActionObjectPropertyCommand(object, "rotation", object.rotation));
 			}
 
 			var newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
@@ -404,9 +406,9 @@ Sidebar.Object = function ( editor ) {
 			}
 			
 			if(objectScaleOverride.dom.checked && !object.scale_overridden) {
-				editor.execute(new AddVariantCommand(object, "scale"));
+				editor.execute(new AddActionObjectPropertyCommand(object, "scale", object.scale));
 			} else if (!objectScaleOverride.dom.checked && object.scale_overridden) {
-				editor.execute(new RemoveVariantCommand(object, "scale"));
+				editor.execute(new RemoveActionObjectPropertyCommand(object, "scale", object.scale));
 			}
 
 			if ( object.fov !== undefined && Math.abs( object.fov - objectFov.getValue() ) >= 0.01 ) {
