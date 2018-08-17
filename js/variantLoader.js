@@ -8,7 +8,7 @@ function Load3DFile(filename, basefolder) {
     xhr.filename = filename;
     xhr.onload = function(params) {
         params.currentTarget.response.name = params.currentTarget.filename;
-        editor.loader.loadFile( params.currentTarget.response, basefolder+"/WebGL Models/"+getCurrentModel().path+"/" , params.currentTarget.objectAddPromise);
+        editor.loader.loadFile( params.currentTarget.response, basefolder+"/WebGL Models/"+getCurrentModel().getPath()+"/" , params.currentTarget.objectAddPromise);
     }
     xhr.objectAddPromise = $.Deferred()
     var objectAddPromise = xhr.objectAddPromise;
@@ -16,55 +16,37 @@ function Load3DFile(filename, basefolder) {
     return objectAddPromise;
 }
 
-function get3DFiles(cb) {
-    $.ajax({
-        url: "i2database.php",
-        type: "POST",
-        data: {
-            api: "get3DFilesByModelID",
-            modelid: getCurrentModel().id
-        },
-        dataType: "json",
-        success: function(data){
-            cb(data);
-        },
-        error: function() { console.error("Error while getting 3d files by model id"); },
-        complete: function() { }
-    });
-}
+async function LoadModelVariant() {
+    let filenames = await getCurrentModel().get3DFiles();
+    var objectAddPromises = [];
+    for(var i = 0; i < filenames.length; i++) {
+        objectAddPromises.push(Load3DFile(filenames[i]));
+    }
 
-function LoadModelVariant() {
-    get3DFiles(function(filenames) {
-        var objectAddPromises = [];
-        for(var i = 0; i < filenames.length; i++) {
-            objectAddPromises.push(Load3DFile(filenames[i]));
-        }
-
-        $.when.apply($, objectAddPromises).done(function(){
-            var action = JSON.parse(currentVariant.action);
-            for(var j = 0; j < action.length; j++) {
-                var sel = action[j].selector;
-                if(sel.type == "hierarchy") {
-                    var obj = editor.scene;
-                    for(var k = 1; k < sel.hierarchy.length; k++) {
-                        obj = obj.children.find(function(e) {
-                            if(e.name == sel.hierarchy[k]) {
-                                return true;
-                            }
-                            return false;
-                        })
-                    }
+    $.when.apply($, objectAddPromises).done(function(){
+        var action = JSON.parse(currentVariant.action);
+        for(var j = 0; j < action.length; j++) {
+            var sel = action[j].selector;
+            if(sel.type == "hierarchy") {
+                var obj = editor.scene;
+                for(var k = 1; k < sel.hierarchy.length; k++) {
+                    obj = obj.children.find(function(e) {
+                        if(e.name == sel.hierarchy[k]) {
+                            return true;
+                        }
+                        return false;
+                    })
                 }
-                var prop = sel.property;
-                var val = action[j].value;
-                var propSel = new I2Conf.hierarchyPropertySelector(obj, prop);
-                
-                eval("obj."+prop+"_overridden = true;");
-                eval("obj."+prop+"_propSel = propSel;");
-                eval("obj."+prop+".copy(val)");
-                eval("autoPropertyChangeList.addItem(obj."+prop+"_propSel, obj."+prop+");");
             }
-        });
+            var prop = sel.property;
+            var val = action[j].value;
+            var propSel = new I2Conf.hierarchyPropertySelector(obj, prop);
+            
+            eval("obj."+prop+"_overridden = true;");
+            eval("obj."+prop+"_propSel = propSel;");
+            eval("obj."+prop+".copy(val)");
+            eval("autoPropertyChangeList.addItem(obj."+prop+"_propSel, obj."+prop+");");
+        }
     });
 }
 
@@ -76,48 +58,17 @@ function getBaseFolder() {
 
 function getModelFolder() {
     var basefolder = getBaseFolder();
-    return basefolder+"/WebGL Models/"+getCurrentModel().path+"/";
-}
-
-function getVariantIDFromRequestURL() {
-    var variantname = getParameterByName("variantid");
-    return variantname;
+    return basefolder+"/WebGL Models/"+getCurrentModel().getPath()+"/";
 }
 
 var currentVariant = {};
 var currentModel = {};
-function setCurrentModelAndVariant(cb) {
-    var variantid = getVariantIDFromRequestURL();
-    var basefolder = getBaseFolder();
-    $.ajax({
-        url: "i2database.php",
-        type: "POST",
-        data: {
-            api: "getVariantByID",
-            variantid: variantid
-        },
-        dataType: "json",
-        success: function(data){
-            currentVariant = data;
-            $.ajax({
-                url: "i2database.php",
-                type: "POST",
-                data: {
-                    api: "getModelByID",
-                    modelid: currentVariant["id model"]
-                },
-                dataType: "json",
-                success: function(data){
-                    currentModel = data;
-                    cb();
-                },
-                error: function() { console.error("error while loading model by ID"); },
-                complete: function() { }
-            });
-        },
-        error: function() { console.error("error while loading variant by ID"); },
-        complete: function() { }
-    });
+async function setCurrentModelAndVariant(cb) {
+    var modelid = getParameterByName("modelid");
+    var variantid = getParameterByName("variantid");
+    currentVariant = await i2VariantBuilder.getVariantByID(variantid);
+    currentModel = await i2ModelBuilder.getModelByID(modelid);
+    cb();
 }
 
 function getCurrentVariant() {
