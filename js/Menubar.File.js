@@ -48,19 +48,6 @@ Menubar.File = function ( editor ) {
 			error: function() { console.error("Error while getting 3d files by model id"); },
 			complete: function() { }
 		});
-		/*$.post(
-			"save.php",
-			{
-				modelFolder: getParameterByName("model"),
-				name: variantname,
-				filenames: currentVariant.filenames,
-				propertyChange: autoPropertyChangeList.toJSON()
-			},
-			function( result )
-			{
-				// success
-			}
-		);*/
 	} );
 	options.add( option );
 
@@ -73,7 +60,7 @@ Menubar.File = function ( editor ) {
 		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 			var beforequery = window.location.href.substring(0, window.location.href.lastIndexOf("?"));
 			var basefolder = beforequery.substring(0, beforequery.lastIndexOf("/"));
-			window.location = basefolder+"/explorer.php#"+getCurrentModel().path;
+			window.location = basefolder+"/explorer.php#"+getCurrentModel().getPath();
 		}
 	} );
 	options.add( option );
