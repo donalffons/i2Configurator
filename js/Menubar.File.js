@@ -28,29 +28,6 @@ Menubar.File = function ( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// Save
-
-	var option = new UI.Row();
-	option.setClass( 'option' );
-	option.setTextContent( 'Save' );
-	option.onClick( function () {
-		$.ajax({
-			url: "i2database.php",
-			type: "POST",
-			data: {
-				api: "saveVariant",
-				variantid: getCurrentVariant().id,
-				action: autoPropertyChangeList.toJSON()
-			},
-			dataType: "json",
-			success: function(data){
-			},
-			error: function() { console.error("Error while getting 3d files by model id"); },
-			complete: function() { }
-		});
-	} );
-	options.add( option );
-
 	// Close
 
 	var option = new UI.Row();

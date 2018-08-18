@@ -23,30 +23,14 @@ async function LoadModelVariant() {
         objectAddPromises.push(Load3DFile(filenames[i]));
     }
 
-    $.when.apply($, objectAddPromises).done(function(){
-        var action = JSON.parse(currentVariant.action);
-        for(var j = 0; j < action.length; j++) {
-            var sel = action[j].selector;
-            if(sel.type == "hierarchy") {
-                var obj = editor.scene;
-                for(var k = 1; k < sel.hierarchy.length; k++) {
-                    obj = obj.children.find(function(e) {
-                        if(e.name == sel.hierarchy[k]) {
-                            return true;
-                        }
-                        return false;
-                    })
-                }
-            }
-            var prop = sel.property;
-            var val = action[j].value;
-            var propSel = new I2Conf.hierarchyPropertySelector(obj, prop);
-            
-            eval("obj."+prop+"_overridden = true;");
-            eval("obj."+prop+"_propSel = propSel;");
-            eval("obj."+prop+".copy(val)");
-            eval("autoPropertyChangeList.addItem(obj."+prop+"_propSel, obj."+prop+");");
-        }
+    $.when.apply($, objectAddPromises).done(async() => {
+        let actionsPromise = getCurrentVariant().getActions();
+        actionsPromise.then((actions) => {
+            actions.forEach((action) => {
+                action.getObjectsSelector().setSceneRoot(editor.scene);
+                action.execute();
+            });
+        }, () => {});
     });
 }
 

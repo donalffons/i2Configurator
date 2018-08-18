@@ -54,9 +54,6 @@ var Editor = function () {
 		objectAdded: new Signal(),
 		objectChanged: new Signal(),
 		objectRemoved: new Signal(),
-		
-		variantAdded: new Signal(),
-		variantRemoved: new Signal(),
 
 		helperAdded: new Signal(),
 		helperRemoved: new Signal(),
