@@ -29,6 +29,22 @@ async function LoadModelVariant() {
             actions.forEach((action) => {
                 action.getObjectsSelector().setSceneRoot(editor.scene);
                 action.execute();
+                if(action.getTags().autoAction !== undefined) {
+                    object = action.getObjectsSelector().getObjects()[0];
+                    if(action.getTags().autoAction == "object.position") {
+                        object.position_overridden = true;
+                        object.position_autoAction = action;
+                        editor.signals.objectChanged.dispatch(object);
+                    } else if(action.getTags().autoAction == "object.rotation") {
+                        object.rotation_overridden = true;
+                        object.rotation_autoAction = action;
+                        editor.signals.objectChanged.dispatch(object);
+                    } else if(action.getTags().autoAction == "object.scale") {
+                        object.scale_overridden = true;
+                        object.scale_autoAction = action;
+                        editor.signals.objectChanged.dispatch(object);
+                    }
+                }
             });
         }, () => {});
     });

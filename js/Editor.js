@@ -160,6 +160,7 @@ Editor.prototype = {
 		newAction.setObjectsSelector(new i2ObjectsHierarchySelector(this.scene, [object]));
 		newAction.setProperty(property);
 		newAction.setValue(new i2Value(value));
+		newAction.setTags({autoAction: "object."+property})
 		await newAction.save();
 
 		this.signals.refreshSidebarObject3D.dispatch( object );
@@ -168,10 +169,28 @@ Editor.prototype = {
 	},
 
 	removeActionObjectProperty: async function ( action ) {
+		action.getObjectsSelector().setSceneRoot(editor.scene);
 		let object = action.getObjectsSelector().getObjects()[0];
+		let currTags = action.getTags();
 		await action.delete();
-
-		this.signals.refreshSidebarObject3D.dispatch( object );
+		
+		if(currTags.autoAction !== undefined) {
+			if(currTags.autoAction == "object.position") {
+				object.position.copy(object.position_default);
+				object.position_overridden = false;
+				object.position_autoAction = null;
+			} else if(currTags.autoAction == "object.rotation") {
+				object.rotation.copy(object.rotation_default);
+				object.rotation_overridden = false;
+				object.rotation_autoAction = null;
+			} else if(currTags.autoAction == "object.scale") {
+				object.position.copy(object.scale_default);
+				object.scale_overridden = false;
+				object.scale_autoAction = null;
+			}
+			this.signals.objectChanged.dispatch(object);
+			this.signals.refreshSidebarObject3D.dispatch( object );
+		}
 	},
 
 	moveObject: function ( object, parent, before ) {
