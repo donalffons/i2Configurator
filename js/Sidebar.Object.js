@@ -380,22 +380,24 @@ Sidebar.Object = function ( editor ) {
 			}
 
 			if(objectPositionOverride.dom.checked && !object.position_overridden) {
-				editor.execute(new AddVariantCommand(object, "position"));
+				object.position_overridden = true;
+				editor.execute(new AddActionObjectPropertyCommand(object, "position", object.position, (action) => {object.position_autoAction = action;}));
 			} else if (!objectPositionOverride.dom.checked && object.position_overridden) {
-				editor.execute(new RemoveVariantCommand(object, "position"));
+				object.position_overridden = false;
+				editor.execute(new RemoveActionObjectPropertyCommand(object.position_autoAction, () => {object.position_autoAction = null;}));
 			}
 
 			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
-
 				editor.execute( new SetRotationCommand( object, newRotation ) );
-
 			}
 			
 			if(objectRotationOverride.dom.checked && !object.rotation_overridden) {
-				editor.execute(new AddVariantCommand(object, "rotation"));
+				object.rotation_overridden = true;
+				editor.execute(new AddActionObjectPropertyCommand(object, "rotation", object.rotation, (action) => {object.rotation_autoAction = action;}));
 			} else if (!objectRotationOverride.dom.checked && object.rotation_overridden) {
-				editor.execute(new RemoveVariantCommand(object, "rotation"));
+				object.rotation_overridden = false;
+				editor.execute(new RemoveActionObjectPropertyCommand(object.rotation_autoAction, () => {object.rotation_autoAction = null;}));
 			}
 
 			var newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
@@ -404,9 +406,11 @@ Sidebar.Object = function ( editor ) {
 			}
 			
 			if(objectScaleOverride.dom.checked && !object.scale_overridden) {
-				editor.execute(new AddVariantCommand(object, "scale"));
+				object.scale_overridden = true;
+				editor.execute(new AddActionObjectPropertyCommand(object, "scale", object.scale, (action) => {object.scale_autoAction = action;}));
 			} else if (!objectScaleOverride.dom.checked && object.scale_overridden) {
-				editor.execute(new RemoveVariantCommand(object, "scale"));
+				object.scale_overridden = false;
+				editor.execute(new RemoveActionObjectPropertyCommand(object.scale_autoAction, () => {object.scale_autoAction = null;}));
 			}
 
 			if ( object.fov !== undefined && Math.abs( object.fov - objectFov.getValue() ) >= 0.01 ) {
@@ -595,6 +599,19 @@ Sidebar.Object = function ( editor ) {
 	signals.objectChanged.add( function ( object ) {
 
 		if ( object !== editor.selected ) return;
+
+		if(object.position_autoAction !== undefined && object.position_autoAction != null) {
+			object.position_autoAction.setValue(new i2Value(object.position));
+			object.position_autoAction.save();
+		}
+		if(object.rotation_autoAction !== undefined && object.rotation_autoAction != null) {
+			object.rotation_autoAction.setValue(new i2Value(object.rotation));
+			object.rotation_autoAction.save();
+		}
+		if(object.scale_autoAction !== undefined && object.scale_autoAction != null) {
+			object.scale_autoAction.setValue(new i2Value(object.scale));
+			object.scale_autoAction.save();
+		}
 
 		updateUI( object );
 

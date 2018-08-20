@@ -54,9 +54,6 @@ var Editor = function () {
 		objectAdded: new Signal(),
 		objectChanged: new Signal(),
 		objectRemoved: new Signal(),
-		
-		variantAdded: new Signal(),
-		variantRemoved: new Signal(),
 
 		helperAdded: new Signal(),
 		helperRemoved: new Signal(),
@@ -157,32 +154,43 @@ Editor.prototype = {
 
 	},
 
-	addVariant: function ( object, propertyName ) {
-		var propSel = new I2Conf.hierarchyPropertySelector(object, propertyName);
-		eval("object."+propertyName+"_propSel = propSel;");
-		eval("autoPropertyChangeList.addItem(object."+propertyName+"_propSel, object."+propertyName+");");
-		eval("object."+propertyName+"_overridden = true;");
+	addActionObjectProperty: async function ( object, property, value ) {
+		let newAction = await i2ActionBuilder.createNewAction("i2ActionObjectProperty");
+		newAction.addVariantID(getCurrentVariant().getID());
+		newAction.setObjectsSelector(new i2ObjectsHierarchySelector(this.scene, [object]));
+		newAction.setProperty(property);
+		newAction.setValue(new i2Value(value));
+		newAction.setTags({autoAction: "object."+property})
+		await newAction.save();
 
-		this.signals.variantAdded.dispatch( object, propertyName );
 		this.signals.refreshSidebarObject3D.dispatch( object );
+
+		return newAction;
 	},
 
-	removeVariant: function ( object, propertyName ) {
-		eval("autoPropertyChangeList.removeItem(object."+propertyName+"_propSel);");
-		eval("object."+propertyName+"_propSel = undefined;");
-		eval("object."+propertyName+"_overridden = false;");
-		if(propertyName == "position") {
-			editor.execute( new SetPositionCommand( object, object.position_default ) );
+	removeActionObjectProperty: async function ( action ) {
+		action.getObjectsSelector().setSceneRoot(editor.scene);
+		let object = action.getObjectsSelector().getObjects()[0];
+		let currTags = action.getTags();
+		await action.delete();
+		
+		if(currTags.autoAction !== undefined) {
+			if(currTags.autoAction == "object.position") {
+				object.position.copy(object.position_default);
+				object.position_overridden = false;
+				object.position_autoAction = null;
+			} else if(currTags.autoAction == "object.rotation") {
+				object.rotation.copy(object.rotation_default);
+				object.rotation_overridden = false;
+				object.rotation_autoAction = null;
+			} else if(currTags.autoAction == "object.scale") {
+				object.position.copy(object.scale_default);
+				object.scale_overridden = false;
+				object.scale_autoAction = null;
+			}
+			this.signals.objectChanged.dispatch(object);
+			this.signals.refreshSidebarObject3D.dispatch( object );
 		}
-		if(propertyName == "rotation") {
-			editor.execute( new SetRotationCommand( object, object.rotation_default ) );
-		}
-		if(propertyName == "scale") {
-			editor.execute( new SetScaleCommand( object, object.scale_default ) );
-		}
-
-		this.signals.variantRemoved.dispatch( object, propertyName );
-		this.signals.refreshSidebarObject3D.dispatch( object );
 	},
 
 	moveObject: function ( object, parent, before ) {

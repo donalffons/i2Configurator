@@ -29,23 +29,23 @@ AddObjectCommand.prototype = {
 
 		this.object.position_default = this.object.position.clone();
 		this.object.position_overridden = false;
-		this.object.position_propSel = undefined;
+		this.object.position_autoAction = undefined;
 		this.object.rotation_default = this.object.rotation.clone();
 		this.object.rotation_overridden = false;
-		this.object.rotation_propSel = undefined;
+		this.object.rotation_autoAction = undefined;
 		this.object.scale_default = this.object.scale.clone();
 		this.object.scale_overridden = false;
-		this.object.scale_propSel = undefined;
+		this.object.scale_autoAction = undefined;
 		this.object.traverse(function(o){
 			o.position_default = o.position.clone();
 			o.position_overridden = false;
-			o.position_propSel = undefined;
+			o.position_autoAction = undefined;
 			o.rotation_default = o.rotation.clone();
 			o.rotation_overridden = false;
-			o.rotation_propSel = undefined;
+			o.rotation_autoAction = undefined;
 			o.scale_default = o.scale.clone();
 			o.scale_overridden = false;
-			o.scale_propSel = undefined;
+			o.scale_autoAction = undefined;
 		});
 
 		this.editor.addObject( this.object );
