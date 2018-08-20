@@ -7,6 +7,20 @@ More info coming soon...
 
 [Test environment](https://interactiveimpressions.com/i2configurator/explorer.php). Feel free to mess around with it!
 
+## Sub-Projects:
+
+* Core & Database Functionality
+
+   [i2ConfiguratorCore](https://github.com/donalffons/i2ConfiguratorCore)
+
+* Model & Variant Explorer Component
+
+   [i2ConfiguratorExplorer](https://github.com/donalffons/i2ConfiguratorExplorer)
+ 
+* Model Editor / Viewer Component
+ 
+   [i2ConfiguratorEditorViewer](https://github.com/donalffons/i2ConfiguratorEditorViewer)
+
 ## Installation
 This project is using [AWS CodeDeploy](https://aws.amazon.com/de/codedeploy/) for automatic deployment on the production server. The following files are used during deployment:
 * ./appspec.yml
@@ -14,8 +28,8 @@ This project is using [AWS CodeDeploy](https://aws.amazon.com/de/codedeploy/) fo
 * ./deploy/afterinstall.sh
 
 ### Requirements
-* HTTP Server
-* PHP
+* HTTP Server (tested with Apache)
+* PHP > 5.6
 * MySQL database
 
 This project will automatically generate the *i2configurator* database and all required tables, if they don't exist.
