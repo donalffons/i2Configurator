@@ -184,7 +184,7 @@ Editor.prototype = {
 				object.rotation_overridden = false;
 				object.rotation_autoAction = null;
 			} else if(currTags.autoAction == "object.scale") {
-				object.position.copy(object.scale_default);
+				object.scale.copy(object.scale_default);
 				object.scale_overridden = false;
 				object.scale_autoAction = null;
 			}
