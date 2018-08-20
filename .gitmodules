@@ -8,3 +8,6 @@
 [submodule "i2ConfiguratorExplorer"]
 	path = i2ConfiguratorExplorer
 	url = https://github.com/donalffons/i2ConfiguratorExplorer.git
+[submodule "i2ConfiguratorEditorViewer"]
+	path = i2ConfiguratorEditorViewer
+	url = https://github.com/donalffons/i2ConfiguratorEditorViewer.git
