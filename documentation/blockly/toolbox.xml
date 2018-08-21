@@ -1,0 +1,33 @@
+<xml xmlns="http://www.w3.org/1999/xhtml" id="toolbox" style="display: none;">
+  <block type="onclick">
+    <value name="object">
+      <block type="selectobject">
+        <field name="NAME">OPTIONNAME</field>
+      </block>
+    </value>
+    <statement name="NAME">
+      <block type="highlightobject">
+        <value name="NAME">
+          <block type="lists_create_with" inline="false">
+            <mutation items="3"></mutation>
+            <value name="ADD0">
+              <block type="selectobject">
+                <field name="NAME">OPTIONNAME</field>
+              </block>
+            </value>
+            <value name="ADD1">
+              <block type="selectobject">
+                <field name="NAME">OPTIONNAME</field>
+              </block>
+            </value>
+            <value name="ADD2">
+              <block type="selectobject">
+                <field name="NAME">OPTIONNAME</field>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+    </statement>
+  </block>
+</xml>
