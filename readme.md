@@ -20,6 +20,10 @@ More info coming soon...
 * Model Editor / Viewer Component
  
    [i2ConfiguratorEditorViewer](https://github.com/donalffons/i2ConfiguratorEditorViewer)
+   
+* Wordpress Plugin Component
+
+   [i2Configurator-wordpress](https://github.com/donalffons/i2Configurator-wordpress)
 
 ## Installation
 This project is using [AWS CodeDeploy](https://aws.amazon.com/de/codedeploy/) for automatic deployment on the production server. The following files are used during deployment:
